@@ -12,6 +12,7 @@ services:
     volumes:
       - ./backend/:/app/backend/
       - ./api/:/app/api/
+      - ./db.sqlite3:/app/db.sqlite3
     networks:
       - rhombus-network
 
