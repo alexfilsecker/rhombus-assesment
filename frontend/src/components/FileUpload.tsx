@@ -1,10 +1,14 @@
-import { Button } from "@mui/material";
+import { Alert, Button, CircularProgress } from "@mui/material";
 import axios from "axios";
 import { ChangeEvent, useRef, useState } from "react";
 
 const API_URL = "http://localhost:8000";
 
 const FileUpload = () => {
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
+
   const [file, setFile] = useState<File | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -21,38 +25,58 @@ const FileUpload = () => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await axios.get(`${API_URL}/api`);
-    console.log(response.data);
+    try {
+      setStatus("loading");
+      const response = await axios.get(`${API_URL}/api/`);
+      setStatus("success");
+      console.log(response.data);
+    } catch (e: unknown) {
+      setStatus("error");
+      console.error(e);
+    }
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <h2>Upload Your .csv or .xslx file</h2>
-      <form className="flex flex-col gap-4 w-min">
-        <input
-          type="file"
-          ref={inputRef}
-          accept=".csv"
-          onChange={handleChange}
-          className="hidden"
-        />
-        <div className="flex gap-3 items-end">
-          <Button
-            onClick={() => {
-              inputRef.current?.click();
-            }}
-            variant="outlined"
-          >
-            SELECT
-          </Button>
-          {file !== null && <p>{file.name}</p>}
-        </div>
-        {file !== null && (
-          <Button variant="contained" onClick={handleUpload}>
-            Upload
-          </Button>
-        )}
-      </form>
+    <div className="flex flex-col gap-4 w-80">
+      <h2 className="text-center text-lg font-bold">
+        Upload your .csv or .xslx file
+      </h2>
+      <input
+        type="file"
+        ref={inputRef}
+        accept=".csv"
+        onChange={handleChange}
+        className="hidden"
+      />
+      <div className="flex flex-col w-full gap-1 items-center">
+        <Button
+          onClick={() => {
+            inputRef.current?.click();
+          }}
+          variant="outlined"
+          className="w-min"
+        >
+          SELECT
+        </Button>
+        {file !== null && <p>{file.name}</p>}
+      </div>
+      {file !== null && status === "idle" && (
+        <Button variant="contained" onClick={handleUpload}>
+          PROCESS
+        </Button>
+      )}
+      {status === "loading" && <CircularProgress />}
+      {(status === "success" || status === "error") && (
+        <Alert
+          variant="filled"
+          severity={status}
+          onClose={() => setStatus("idle")}
+        >
+          {status === "success"
+            ? "File Upload Successfull"
+            : "File Upload Error"}
+        </Alert>
+      )}
     </div>
   );
 };
