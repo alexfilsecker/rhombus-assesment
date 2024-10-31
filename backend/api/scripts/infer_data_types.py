@@ -80,8 +80,3 @@ def infer_and_convert_data_types(df: pd.DataFrame) -> pd.DataFrame:
                 continue
 
     return df
-
-
-# Test the function with your DataFrame
-df = pd.read_csv("sample_data.csv")
-hola = infer_and_convert_data_types(df)
