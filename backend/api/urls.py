@@ -1,4 +1,4 @@
 from django.urls import path
-from .views import get_user
+from .views import process_file
 
-urlpatterns = [path("", get_user, name="pene")]
+urlpatterns = [path("process-file", process_file, name="Process File")]
