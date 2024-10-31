@@ -1,11 +1,14 @@
-import { Button } from "@mui/material";
+import FileUpload from "./components/FileUpload";
 
-function App() {
+const App = (): JSX.Element => {
   return (
-    <div className="text-white bg-black text-xl text-center w-screen h-screen">
-      <Button>pene</Button>
+    <div className="w-screen min-h-screen px-32 pt-10">
+      <div className="flex flex-col gap-10">
+        <h1 className="text-5xl font-extrabold">Rhombus AI Assessment</h1>
+        <FileUpload />
+      </div>
     </div>
   );
-}
+};
 
 export default App;
