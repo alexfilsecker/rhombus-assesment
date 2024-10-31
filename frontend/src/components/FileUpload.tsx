@@ -27,7 +27,13 @@ const FileUpload = () => {
 
     try {
       setStatus("loading");
-      const response = await axios.get(`${API_URL}/api/`);
+      const response = await axios.post(
+        `${API_URL}/api/process-file`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       setStatus("success");
       console.log(response.data);
     } catch (e: unknown) {
@@ -60,7 +66,7 @@ const FileUpload = () => {
         </Button>
         {file !== null && <p>{file.name}</p>}
       </div>
-      {file !== null && status === "idle" && (
+      {file !== null && (
         <Button variant="contained" onClick={handleUpload}>
           PROCESS
         </Button>
@@ -70,7 +76,10 @@ const FileUpload = () => {
         <Alert
           variant="filled"
           severity={status}
-          onClose={() => setStatus("idle")}
+          onClose={() => {
+            setStatus("idle");
+            setFile(null);
+          }}
         >
           {status === "success"
             ? "File Upload Successfull"
