@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from datetime import datetime
 from time import time
 import pandas as pd
 from io import BytesIO
@@ -12,7 +11,6 @@ from .serializers import (
     GenericDataSerializer,
     TableColSerializer,
     ALL_KEYS,
-    IMPORTANT_KEYS_BY_DTYPE,
 )
 from .models import GenericData, TableCol
 from django.db import transaction
@@ -119,11 +117,9 @@ def process_file(req: Request) -> Response:
         TableColSerializer(table_col).data for table_col in table_cols_list
     ]
 
-    # Return file ID
-    # Converted data can be retrieved using the file id
     return Response(
         {
-            "file_id": file_id,
+            "file_id": file_id,  # file_id can later be used to retrieve the data
             "data": serialized_generic_data,
             "columns": serialized_table_cols,
         }
