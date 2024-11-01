@@ -7,11 +7,52 @@ from time import time
 import pandas as pd
 from io import BytesIO
 from .scripts.infer_data_types import infer_and_convert_data_types
-from .serializers import GenericDataSerializer
+from .serializers import GenericDataSerializer, TableColSerializer
+from .models import GenericData, TableCol
+from django.db import transaction
+from django.core.exceptions import ValidationError
+from typing import List, Tuple
 
 
 def error400(message: str):
     return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@transaction.atomic
+def create_data(
+    file_id: str, df: pd.DataFrame
+) -> Tuple[List[GenericData], List[TableCol]]:
+    try:
+        generic_data: List[GenericData] = []
+        table_cols: List[TableCol] = []
+        for col in df.columns:
+            table_col_serializer = TableColSerializer(
+                data={"file_id": file_id, "col_name": col, "col_type": df[col].dtype}
+            )
+
+            # Check that the col has been created correctly
+            table_col_serializer.is_valid(raise_exception=True)
+            table_col = table_col_serializer.save()
+            table_cols.append(table_col)
+
+            for row_index, value in enumerate(df[col]):
+                generic_data_serializer = GenericDataSerializer(
+                    data={
+                        "column": table_col.id,
+                        "row": row_index,
+                        "value": str(value),
+                    }
+                )
+                generic_data_serializer.is_valid(raise_exception=True)
+                generic_data.append(
+                    GenericData(**generic_data_serializer.validated_data)
+                )
+
+        generic_data = GenericData.objects.bulk_create(generic_data)
+        return generic_data, table_cols
+
+    except Exception as e:
+        raise ValidationError(f"Failed to create data. {str(e)}")
 
 
 @api_view(["POST"])
@@ -28,7 +69,7 @@ def process_file(req: Request) -> Response:
         return error400("Incorrect file name")
 
     # Ensure file has a correct extension
-    _, extension = file.name.split(".")
+    name, extension = file.name.split(".")
     if extension not in ["csv", "xslx"]:
         return error400(f"Extension '.{extension}' not supported")
 
@@ -39,7 +80,17 @@ def process_file(req: Request) -> Response:
     else:
         df = pd.read_excel(readable)
 
-    # infer data types and transform it
+    # Process the data frame
     df = infer_and_convert_data_types(df)
 
-    return Response({"message": "done"})
+    # Create a unique identifier
+    file_id = f"{name}-{int(time() * 100)}.{extension}"
+
+    # Save data into db
+    generic_data, table_cols = create_data(file_id, df)
+
+    # Return file ID
+    # Converted data can be retrieved using the file id
+    return Response(
+        {"file_id": file_id, "generic_data": generic_data, "table_cols": table_cols}
+    )

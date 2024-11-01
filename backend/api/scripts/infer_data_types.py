@@ -76,7 +76,7 @@ def infer_and_convert_data_types(df: pd.DataFrame) -> pd.DataFrame:
             if number_conversion(df, col):
                 continue
 
-            if date_time_conversion(df, col):
-                continue
+            # if date_time_conversion(df, col):
+            #     continue
 
     return df
