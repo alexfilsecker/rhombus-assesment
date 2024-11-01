@@ -21,12 +21,13 @@ class TableCol(models.Model):
     }
 
     file_id = models.CharField(max_length=50, null=False, blank=False)
+    col_index = models.PositiveIntegerField(null=False)
     col_name = models.CharField(max_length=30, null=False, blank=False)
     col_type = models.CharField(choices=TYPES, max_length=10)
 
     class Meta:
         db_table = "api_table_col"
-        indexes = [models.Index(fields=["file_id", "col_name"])]
+        indexes = [models.Index(fields=["file_id", "col_index"])]
 
     def __str__(self):
         return (

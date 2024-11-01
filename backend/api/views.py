@@ -32,9 +32,14 @@ def create_data(
     try:
         generic_data: List[GenericData] = []
         table_cols: List[TableCol] = []
-        for col in df.columns:
+        for col_index, col in enumerate(df.columns):
             table_col_serializer = TableColSerializer(
-                data={"file_id": file_id, "col_name": col, "col_type": df[col].dtype}
+                data={
+                    "file_id": file_id,
+                    "col_name": col,
+                    "col_type": df[col].dtype,
+                    "col_index": col_index,
+                }
             )
 
             # Check that the col has been created correctly
@@ -104,13 +109,22 @@ def process_file(req: Request) -> Response:
     file_id = f"{name}-{int(time() * 100)}.{extension}"
 
     # Save data into db
-    generic_data, table_cols = create_data(file_id, df)
+    generic_data_list, table_cols_list = create_data(file_id, df)
 
     # serialize the saved data
-    # one_data = generic_data[0]
-    # ser = GenericDataSerializer(one_data)
-    # print(ser.value)
+    serialized_generic_data = [
+        GenericDataSerializer(generic_data).data for generic_data in generic_data_list
+    ]
+    serialized_table_cols = [
+        TableColSerializer(table_col).data for table_col in table_cols_list
+    ]
 
     # Return file ID
     # Converted data can be retrieved using the file id
-    return Response({"file_id": file_id})
+    return Response(
+        {
+            "file_id": file_id,
+            "data": serialized_generic_data,
+            "columns": serialized_table_cols,
+        }
+    )
