@@ -49,7 +49,6 @@ class GenericDataSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance: Union[GenericData, List[GenericData]]):
         dtype: str = instance.column.col_type
-        print("dtype", dtype)
         data = {
             "row_index": instance.row,
             "column_index": instance.column.col_index,
@@ -99,3 +98,10 @@ class TableColSerializer(serializers.ModelSerializer):
             )
 
         return value
+
+    def to_representation(self, instance: TableCol):
+        return {
+            "col_index": instance.col_index,
+            "col_type": instance.col_type,
+            "col_name": instance.col_name,
+        }

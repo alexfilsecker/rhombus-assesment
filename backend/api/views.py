@@ -2,7 +2,6 @@ from io import BytesIO
 from time import time
 from typing import List, Tuple
 
-import numpy as np
 import pandas as pd
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
