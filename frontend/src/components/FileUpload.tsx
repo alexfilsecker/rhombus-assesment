@@ -1,6 +1,6 @@
-import { Alert, Button, CircularProgress } from "@mui/material";
+import { Alert, Button, CircularProgress, Collapse } from "@mui/material";
 import axios from "axios";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 const API_URL = "http://localhost:8000";
 
@@ -9,14 +9,28 @@ const FileUpload = () => {
     "idle" | "loading" | "success" | "error"
   >("idle");
 
+  const [alertStatus, setAlertStatus] = useState<"success" | "error">("error");
+
+  const [openAlert, setOpenAlert] = useState<boolean>(false);
+
   const [file, setFile] = useState<File | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (status === "success" || status === "error") {
+      setOpenAlert(true);
+      setAlertStatus(status);
+    } else {
+      setOpenAlert(false);
+    }
+  }, [status]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files === null || files.length === 0) return;
     setFile(files[0]);
+    setOpenAlert(false);
   };
 
   const handleUpload = async () => {
@@ -71,21 +85,20 @@ const FileUpload = () => {
           PROCESS
         </Button>
       )}
-      {status === "loading" && <CircularProgress />}
-      {(status === "success" || status === "error") && (
+      {status === "loading" && <CircularProgress className="self-center" />}
+      <Collapse in={openAlert}>
         <Alert
           variant="filled"
-          severity={status}
+          severity={alertStatus}
           onClose={() => {
             setStatus("idle");
-            setFile(null);
           }}
         >
           {status === "success"
             ? "File Upload Successfull"
             : "File Upload Error"}
         </Alert>
-      )}
+      </Collapse>
     </div>
   );
 };
