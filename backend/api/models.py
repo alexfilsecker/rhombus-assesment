@@ -42,7 +42,7 @@ class GenericData(models.Model):
     uint_value = models.PositiveBigIntegerField()
     double_value = models.FloatField()
     timestamp_value = models.TimeField()
-    time_zone_value = models.SmallIntegerField()
+    time_zone_value = models.CharField(max_length=50)
 
     class Meta:
         indexes = [models.Index(fields=["column", "row"])]
