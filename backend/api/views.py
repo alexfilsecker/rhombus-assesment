@@ -3,15 +3,22 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from datetime import datetime
 from time import time
 import pandas as pd
 from io import BytesIO
 from .scripts.infer_data_types import infer_and_convert_data_types
-from .serializers import GenericDataSerializer, TableColSerializer
+from .serializers import (
+    GenericDataSerializer,
+    TableColSerializer,
+    ALL_KEYS,
+    IMPORTANT_KEYS_BY_DTYPE,
+)
 from .models import GenericData, TableCol
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from typing import List, Tuple
+import numpy as np
 
 
 def error400(message: str):
@@ -36,13 +43,23 @@ def create_data(
             table_cols.append(table_col)
 
             for row_index, value in enumerate(df[col]):
-                generic_data_serializer = GenericDataSerializer(
-                    data={
-                        "column": table_col.id,
-                        "row": row_index,
-                        "value": str(value),
-                    }
-                )
+
+                data = {
+                    "column": table_col.id,
+                    "row": row_index,
+                    **{key: None for key in ALL_KEYS},
+                }
+
+                dtype: str = table_col.col_type
+                if dtype == "object":
+                    data["string_value"] = value
+                elif dtype.startswith("uint"):
+                    data["uint_value"] = value
+                elif dtype.startswith("int"):
+                    data["uint_value"] = abs(value)
+                    data["int_sign_value"] = 1 if value >= 0 else -1
+
+                generic_data_serializer = GenericDataSerializer(data=data)
                 generic_data_serializer.is_valid(raise_exception=True)
                 generic_data.append(
                     GenericData(**generic_data_serializer.validated_data)
@@ -89,8 +106,11 @@ def process_file(req: Request) -> Response:
     # Save data into db
     generic_data, table_cols = create_data(file_id, df)
 
+    # serialize the saved data
+    # one_data = generic_data[0]
+    # ser = GenericDataSerializer(one_data)
+    # print(ser.value)
+
     # Return file ID
     # Converted data can be retrieved using the file id
-    return Response(
-        {"file_id": file_id, "generic_data": generic_data, "table_cols": table_cols}
-    )
+    return Response({"file_id": file_id})
