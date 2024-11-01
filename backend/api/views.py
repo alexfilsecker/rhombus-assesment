@@ -1,22 +1,20 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.request import Request
-from rest_framework import status
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from time import time
-import pandas as pd
 from io import BytesIO
-from .scripts.infer_data_types import infer_and_convert_data_types
-from .serializers import (
-    GenericDataSerializer,
-    TableColSerializer,
-    ALL_KEYS,
-)
-from .models import GenericData, TableCol
-from django.db import transaction
-from django.core.exceptions import ValidationError
+from time import time
 from typing import List, Tuple
+
 import numpy as np
+import pandas as pd
+from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.db import transaction
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.request import Request
+from rest_framework.response import Response
+
+from .models import GenericData, TableCol
+from .scripts.infer_data_types import infer_and_convert_data_types
+from .serializers import ALL_KEYS, GenericDataSerializer, TableColSerializer
 
 
 def error400(message: str):
