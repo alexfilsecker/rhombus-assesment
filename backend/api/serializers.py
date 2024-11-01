@@ -102,6 +102,7 @@ class TableColSerializer(serializers.ModelSerializer):
     def to_representation(self, instance: TableCol):
         return {
             "col_index": instance.col_index,
-            "col_type": instance.col_type,
             "col_name": instance.col_name,
+            "col_type": instance.col_type,
+            "humam_col_type": TableCol.TYPES[instance.col_type],
         }
