@@ -1,7 +1,6 @@
 from io import BytesIO
-import json
 from time import time
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any, Union
 
 import pandas as pd
 from django.core.exceptions import ValidationError
@@ -73,6 +72,11 @@ def create_data(
         raise ValidationError(f"Failed to create data. {str(e)}")
 
 
+def printlist(list):
+    for i in list:
+        print(i)
+
+
 @api_view(["POST"])
 def process_file(req: Request) -> Response:
 
@@ -105,30 +109,34 @@ def process_file(req: Request) -> Response:
     file_id = f"{name}-{int(time() * 100)}.{extension}"
 
     # Save data into db
-    generic_data_list, table_cols_list = create_data(file_id, df)
+    generic_data_models, table_col_models = create_data(file_id, df)
 
     # serialize the saved data
-    serialized_generic_data = [
-        GenericDataSerializer(generic_data).data for generic_data in generic_data_list
-    ]
     serialized_table_cols = [
-        TableColSerializer(table_col).data for table_col in table_cols_list
+        TableColSerializer(table_col).data for table_col in table_col_models
     ]
 
-    return_data = {
-        col["col_index"]: {**col, "rows": []} for col in serialized_table_cols
-    }
+    num_of_cols = len(serialized_table_cols)
+    num_of_rows = int(len(generic_data_models) / num_of_cols)
 
-    for generic_data in serialized_generic_data:
-        return_data[generic_data["col_index"]]["rows"].append(
-            {"row_index": generic_data["row_index"], "value": generic_data["value"]}
-        )
+    rows: List[List[Dict[str, Any]]] = [
+        [{} for _ in range(num_of_cols)] for _ in range(num_of_rows)
+    ]
+    for generic_data_model in generic_data_models:
+        serialized_generic_data = GenericDataSerializer(generic_data_model).data
 
-    return_data = return_data.values()
+        row_index = serialized_generic_data["row_index"]
+        col_index = serialized_generic_data["col_index"]
+        value = serialized_generic_data["value"]
+
+        value_dict = {"row_index": row_index, "col_index": col_index, "value": value}
+
+        rows[row_index][col_index] = value_dict
 
     return Response(
         {
             "file_id": file_id,  # file_id can later be used to retrieve the data
-            "data": return_data,
+            "cols": serialized_table_cols,
+            "rows": rows,
         }
     )
