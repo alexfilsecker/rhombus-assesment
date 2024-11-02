@@ -1,10 +1,22 @@
 import { Alert, Button, CircularProgress, Collapse } from "@mui/material";
 import axios from "axios";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  useEffect,
+  useRef,
+  useState,
+  Dispatch,
+  SetStateAction,
+} from "react";
+import { ApiResponse } from "../App";
 
 const API_URL = "http://localhost:8000";
 
-const FileUpload = () => {
+type FileUploadProps = {
+  setTableData: Dispatch<SetStateAction<ApiResponse | null>>;
+};
+
+const FileUpload = ({ setTableData }: FileUploadProps) => {
   const [status, setStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle");
@@ -41,7 +53,7 @@ const FileUpload = () => {
 
     try {
       setStatus("loading");
-      const response = await axios.post(
+      const response = await axios.post<ApiResponse>(
         `${API_URL}/api/process-file`,
         formData,
         {
@@ -49,7 +61,7 @@ const FileUpload = () => {
         }
       );
       setStatus("success");
-      console.log(response.data);
+      setTableData(response.data);
     } catch (e: unknown) {
       setStatus("error");
       console.error(e);
@@ -80,12 +92,14 @@ const FileUpload = () => {
         </Button>
         {file !== null && <p>{file.name}</p>}
       </div>
-      {file !== null && (
-        <Button variant="contained" onClick={handleUpload}>
-          PROCESS
-        </Button>
-      )}
-      {status === "loading" && <CircularProgress className="self-center" />}
+      {file !== null &&
+        (status !== "loading" ? (
+          <Button variant="contained" onClick={handleUpload}>
+            PROCESS
+          </Button>
+        ) : (
+          <CircularProgress className="self-center" />
+        ))}
       <Collapse in={openAlert}>
         <Alert
           variant="filled"
@@ -94,7 +108,7 @@ const FileUpload = () => {
             setStatus("idle");
           }}
         >
-          {status === "success"
+          {alertStatus === "success"
             ? "File Upload Successfull"
             : "File Upload Error"}
         </Alert>

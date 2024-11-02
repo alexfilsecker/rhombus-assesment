@@ -112,31 +112,31 @@ def process_file(req: Request) -> Response:
     generic_data_models, table_col_models = create_data(file_id, df)
 
     # serialize the saved data
-    serialized_table_cols = [
-        TableColSerializer(table_col).data for table_col in table_col_models
-    ]
+    cols = {}
+    for table_col_model in table_col_models:
+        table_col = TableColSerializer(table_col_model).data
+        cols[table_col["col_name"]] = table_col
 
-    num_of_cols = len(serialized_table_cols)
+    num_of_cols = len(cols)
     num_of_rows = int(len(generic_data_models) / num_of_cols)
 
-    rows: List[List[Dict[str, Any]]] = [
-        [{} for _ in range(num_of_cols)] for _ in range(num_of_rows)
-    ]
+    rows: List[Dict[str, Any]] = [{"values": {}} for _ in range(num_of_rows)]
     for generic_data_model in generic_data_models:
         serialized_generic_data = GenericDataSerializer(generic_data_model).data
 
         row_index = serialized_generic_data["row_index"]
-        col_index = serialized_generic_data["col_index"]
+        col_name = serialized_generic_data["col_name"]
         value = serialized_generic_data["value"]
 
-        value_dict = {"row_index": row_index, "col_index": col_index, "value": value}
+        if "row_index" not in rows[row_index]:
+            rows[row_index]["row_index"] = row_index
 
-        rows[row_index][col_index] = value_dict
+        rows[row_index]["values"][col_name] = value
 
     return Response(
         {
             "file_id": file_id,  # file_id can later be used to retrieve the data
-            "cols": serialized_table_cols,
+            "cols": cols,
             "rows": rows,
         }
     )
