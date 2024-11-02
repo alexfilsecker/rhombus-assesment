@@ -104,5 +104,5 @@ class TableColSerializer(serializers.ModelSerializer):
             "col_index": instance.col_index,
             "col_name": instance.col_name,
             "col_type": instance.col_type,
-            "humam_col_type": TableCol.TYPES[instance.col_type],
+            "human_col_type": TableCol.TYPES[instance.col_type],
         }
