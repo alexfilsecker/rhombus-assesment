@@ -51,7 +51,7 @@ class GenericDataSerializer(serializers.ModelSerializer):
         dtype: str = instance.column.col_type
         data = {
             "row_index": instance.row,
-            "column_index": instance.column.col_index,
+            "col_index": instance.column.col_index,
         }
 
         if dtype == "object":

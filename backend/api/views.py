@@ -1,4 +1,5 @@
 from io import BytesIO
+import json
 from time import time
 from typing import List, Tuple
 
@@ -114,10 +115,20 @@ def process_file(req: Request) -> Response:
         TableColSerializer(table_col).data for table_col in table_cols_list
     ]
 
+    return_data = {
+        col["col_index"]: {**col, "rows": []} for col in serialized_table_cols
+    }
+
+    for generic_data in serialized_generic_data:
+        return_data[generic_data["col_index"]]["rows"].append(
+            {"row_index": generic_data["row_index"], "value": generic_data["value"]}
+        )
+
+    return_data = return_data.values()
+
     return Response(
         {
             "file_id": file_id,  # file_id can later be used to retrieve the data
-            "data": serialized_generic_data,
-            "columns": serialized_table_cols,
+            "data": return_data,
         }
     )
