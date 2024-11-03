@@ -36,6 +36,10 @@ class TableCol(models.Model):
 
 
 class GenericData(models.Model):
+    class Meta:
+        db_table = "api_generic_data"
+        indexes = [models.Index(fields=["column", "row"])]
+
     column = models.ForeignKey(TableCol, on_delete=models.CASCADE)
 
     # Big in case rhombus decides to test a masive csv
@@ -48,7 +52,3 @@ class GenericData(models.Model):
     datetime_value = models.DateTimeField(null=True)
     time_zone_info_value = models.CharField(max_length=30, null=True)
     bool_value = models.BooleanField(null=True)
-
-    class Meta:
-        db_table = "api_generic_data"
-        indexes = [models.Index(fields=["column", "row"])]
