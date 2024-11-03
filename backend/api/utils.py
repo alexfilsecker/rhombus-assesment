@@ -4,8 +4,21 @@ import pandas as pd
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
-from .models import GenericData, TableCol
-from .serializers import ALL_KEYS, GenericDataSerializer, TableColSerializer
+from .models.table_col_model import TableCol
+from .models.generic_data_model import GenericData
+from .serializers.generic_data_serializer import GenericDataSerializer
+from .serializers.table_col_serializer import TableColSerializer
+
+
+ALL_KEYS = {
+    "string_value",
+    "int_sign_value",
+    "uint_value",
+    "double_value",
+    "datetime_value",
+    "time_zone_info_value",
+    "bool_value",
+}
 
 
 @transaction.atomic

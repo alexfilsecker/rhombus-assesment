@@ -1,22 +1,10 @@
-from rest_framework import serializers
-from .models import GenericData, TableCol, IMPORTANT_KEYS_BY_DTYPE
-from typing import Dict, Any, Optional, Set, Union, List
+from rest_framework.serializers import ModelSerializer, ValidationError
+from ..models.generic_data_model import GenericData, IMPORTANT_KEYS_BY_DTYPE
+from typing import Dict, Any, Set, Union, List
 import numpy as np
-from django.core.exceptions import ValidationError
 
 
-ALL_KEYS = {
-    "string_value",
-    "int_sign_value",
-    "uint_value",
-    "double_value",
-    "datetime_value",
-    "time_zone_info_value",
-    "bool_value",
-}
-
-
-class GenericDataSerializer(serializers.ModelSerializer):
+class GenericDataSerializer(ModelSerializer):
 
     class Meta:
         model = GenericData
@@ -38,10 +26,10 @@ class GenericDataSerializer(serializers.ModelSerializer):
 
             if key in important_keys:
                 if value is None:
-                    raise serializers.ValidationError(f"{key} cannot be None")
+                    raise ValidationError(f"{key} cannot be None")
             else:
                 if value is not None:
-                    raise serializers.ValidationError(f"{key} must be set to None")
+                    raise ValidationError(f"{key} must be set to None")
 
     def validate(self, values: Dict[str, Any]):
         dtype = values["column"].col_type
@@ -104,52 +92,3 @@ class GenericDataSerializer(serializers.ModelSerializer):
             rows[row_index - self.starting_row]["values"][col_name] = value
 
         return {"rows": rows}
-
-
-class TableColSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TableCol
-        fields = "__all__"
-
-    def validate_col_type(self, value: str):
-        if value not in TableCol.TYPES.keys():
-            raise serializers.ValidationError(
-                f"Invalid column type. Must be one of {list(TableCol.TYPES.keys())}"
-            )
-
-        return value
-
-    def to_representation(self, instance: Union[TableCol, List[TableCol]]):
-        def one_representation(instance: TableCol):
-            return {
-                "col_index": instance.col_index,
-                "col_name": instance.col_name,
-                "col_type": instance.col_type,
-                "human_col_type": TableCol.TYPES[instance.col_type],
-                "id": instance.id,
-            }
-
-        if isinstance(instance, list):
-            cols = {}
-            for table_col_model in instance:
-                table_col = TableColSerializer(table_col_model).data
-                cols[table_col["col_name"]] = table_col
-
-            return cols
-
-        return one_representation(instance)
-
-
-class GetDataSerializer(serializers.Serializer):
-    file_id = serializers.CharField(required=True)
-    page_size = serializers.IntegerField(required=True)
-    page = serializers.IntegerField(default=0)
-
-    sort_by = serializers.CharField(default="row_index")
-    asc = serializers.BooleanField(default=True)
-
-    def validate_file_id(self, value: str):
-        if TableCol.objects.filter(file_id=value).count() == 0:
-            raise ValidationError(f"file_id '{value}' does not exist on db")
-
-        return value

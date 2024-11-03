@@ -9,15 +9,14 @@ from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from api.models import GenericData, TableCol
+from .models.generic_data_model import GenericData
+from .models.table_col_model import TableCol
 
 from .utils import create_data
 from .scripts.infer_data_types import infer_and_convert_data_types
-from .serializers import (
-    GenericDataSerializer,
-    GetDataSerializer,
-    TableColSerializer,
-)
+from .serializers.generic_data_serializer import GenericDataSerializer
+from .serializers.table_col_serializer import TableColSerializer
+from .serializers.get_data_serializer import GetDataSerializer
 
 
 def error400(message: str):
