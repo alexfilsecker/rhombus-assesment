@@ -1,6 +1,8 @@
+from typing import List, Union
+
 from rest_framework.serializers import ModelSerializer, ValidationError
-from typing import Dict, Any, Set, Union, List
-from ..models.table_col_model import TableCol
+
+from api.models.table_col_model import TableCol
 
 
 class TableColSerializer(ModelSerializer):

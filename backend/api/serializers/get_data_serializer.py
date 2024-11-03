@@ -1,11 +1,12 @@
 from rest_framework.serializers import (
-    Serializer,
+    BooleanField,
     CharField,
     IntegerField,
-    BooleanField,
+    Serializer,
     ValidationError,
 )
-from ..models.table_col_model import TableCol
+
+from api.models.table_col_model import TableCol
 
 
 class GetDataSerializer(Serializer):

@@ -1,6 +1,6 @@
 from io import BytesIO
 from time import time
-from typing import List, Dict, Any
+from typing import Any, List
 
 import pandas as pd
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -11,12 +11,11 @@ from rest_framework.response import Response
 
 from .models.generic_data_model import GenericData
 from .models.table_col_model import TableCol
-
-from .utils import create_data
 from .scripts.infer_data_types import infer_and_convert_data_types
 from .serializers.generic_data_serializer import GenericDataSerializer
-from .serializers.table_col_serializer import TableColSerializer
 from .serializers.get_data_serializer import GetDataSerializer
+from .serializers.table_col_serializer import TableColSerializer
+from .utils import create_data
 
 
 def error400(message: str):

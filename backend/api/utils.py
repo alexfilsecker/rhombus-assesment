@@ -4,11 +4,10 @@ import pandas as pd
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
-from .models.table_col_model import TableCol
 from .models.generic_data_model import GenericData
+from .models.table_col_model import TableCol
 from .serializers.generic_data_serializer import GenericDataSerializer
 from .serializers.table_col_serializer import TableColSerializer
-
 
 ALL_KEYS = {
     "string_value",

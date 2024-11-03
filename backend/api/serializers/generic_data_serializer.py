@@ -1,7 +1,9 @@
-from rest_framework.serializers import ModelSerializer, ValidationError
-from ..models.generic_data_model import GenericData, IMPORTANT_KEYS_BY_DTYPE
-from typing import Dict, Any, Set, Union, List
+from typing import Any, Dict, List, Set, Union
+
 import numpy as np
+from rest_framework.serializers import ModelSerializer, ValidationError
+
+from api.models.generic_data_model import IMPORTANT_KEYS_BY_DTYPE, GenericData
 
 
 class GenericDataSerializer(ModelSerializer):
@@ -15,9 +17,9 @@ class GenericDataSerializer(ModelSerializer):
         if "num_of_rows" in kwargs:
             self.num_of_rows = kwargs.pop("num_of_rows")
             self.starting_row = kwargs.pop("starting_row")
-            return super().__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
-        return super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate_nones(self, values: Dict[str, Any], important_keys: Set[str]) -> None:
         for key, value in values.items():
@@ -31,10 +33,10 @@ class GenericDataSerializer(ModelSerializer):
                 if value is not None:
                     raise ValidationError(f"{key} must be set to None")
 
-    def validate(self, values: Dict[str, Any]):
-        dtype = values["column"].col_type
-        self.validate_nones(values, IMPORTANT_KEYS_BY_DTYPE[dtype])
-        return values
+    def validate(self, attrs: Dict[str, Any]):
+        dtype = attrs["column"].col_type
+        self.validate_nones(attrs, IMPORTANT_KEYS_BY_DTYPE[dtype])
+        return attrs
 
     def to_representation(self, instance: Union[GenericData, List[GenericData]]):
         def one_representation(instance: GenericData):
