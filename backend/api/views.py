@@ -73,9 +73,6 @@ def get_data(request: Request):
     request_query = serialized_request.data
     file_id = request_query["file_id"]
 
-    print("\n")
-    print(request_query)
-
     page_size = request_query["page_size"]
     page = request_query["page"]
 
@@ -90,7 +87,7 @@ def get_data(request: Request):
         column__in=[col["id"] for col in cols.values()]
     )
 
-    total_filtered_models = filtered_data_models.count()
+    total_filtered_models = int(filtered_data_models.count() / len(cols))
 
     ordered_data_models = filtered_data_models.order_by(order_by)[
         page * page_size * len(cols) : (page + 1) * page_size * len(cols)
@@ -106,4 +103,12 @@ def get_data(request: Request):
     for _, col in cols.items():
         col.pop("id")
 
-    return Response({"cols": cols, **rows, "total_rows": total_filtered_models})
+    return Response(
+        {
+            "cols": cols,
+            **rows,
+            "total_rows": total_filtered_models,
+            "page": page,
+            "page_size": page_size,
+        }
+    )
