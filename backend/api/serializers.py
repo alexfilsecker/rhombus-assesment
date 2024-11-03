@@ -1,16 +1,9 @@
 from rest_framework import serializers
-from .models import GenericData, TableCol
+from .models import GenericData, TableCol, IMPORTANT_KEYS_BY_DTYPE
 from typing import Dict, Any, Optional, Set, Union, List
 import numpy as np
 from django.core.exceptions import ValidationError
 
-IMPORTANT_KEYS_BY_DTYPE = {
-    "object": {"string_value"},
-    **{f"uint{2 ** i}": {"uint_value"} for i in range(3, 7)},
-    **{f"int{2 ** i}": {"int_value", "int_sign_value"} for i in range(3, 7)},
-    **{f"float{2 ** i}": {"double_value"} for i in range(5, 7)},
-    "bool": "bool_value",
-}
 
 ALL_KEYS = {
     "string_value",

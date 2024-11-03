@@ -68,8 +68,13 @@ def printlist(l: List[Any]):
 
 @api_view(["GET"])
 def get_data(request: Request):
+
+    print("\n--- GET DATA ---\n")
+
+    # Get the request and ensure it is valid
     serialized_request = GetDataSerializer(data=request.query_params)
     serialized_request.is_valid(raise_exception=True)
+
     request_query = serialized_request.data
     file_id = request_query["file_id"]
 
@@ -77,25 +82,32 @@ def get_data(request: Request):
     page = request_query["page"]
 
     sort_by = request_query["sort_by"]
+
+    print(sort_by)
+
     if sort_by == "row_index":
         order_by = "row"
+
+    order_by = "row"
 
     table_cols_models = TableCol.objects.filter(file_id=file_id)
     cols = TableColSerializer(list(table_cols_models)).data
 
-    filtered_data_models = GenericData.objects.filter(
-        column__in=[col["id"] for col in cols.values()]
+    filtered_data_models = GenericData.get_objects_by_columns(cols)
+
+    total_filtered_models = filtered_data_models.count()
+
+    sorted_col_models = GenericData.get_sliced_sorted_cols(
+        filtered_data_models, cols, request_query
     )
 
-    total_filtered_models = int(filtered_data_models.count() / len(cols))
-
-    ordered_data_models = filtered_data_models.order_by(order_by)[
-        page * page_size * len(cols) : (page + 1) * page_size * len(cols)
+    rows_order = [
+        GenericDataSerializer(model).data["row_index"] for model in sorted_col_models
     ]
 
     rows = GenericDataSerializer(
-        list(ordered_data_models),
-        num_of_rows=int(len(ordered_data_models) / len(cols)),
+        list(filtered_data_models),
+        num_of_rows=int(len(filtered_data_models) / len(cols)),
         starting_row=page * page_size,
     ).data
 
@@ -107,7 +119,7 @@ def get_data(request: Request):
         {
             "cols": cols,
             **rows,
-            "total_rows": total_filtered_models,
+            "total_rows": int(total_filtered_models / len(cols)),
             "page": page,
             "page_size": page_size,
         }
