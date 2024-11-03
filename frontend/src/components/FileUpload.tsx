@@ -1,4 +1,4 @@
-import { Alert, Button, CircularProgress, Collapse } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import axios from "axios";
 import {
   ChangeEvent,
@@ -8,22 +8,26 @@ import {
   Dispatch,
   SetStateAction,
 } from "react";
-import { ApiResponse } from "../App";
+import { API_URL, Status } from "../App";
 
-const API_URL = "http://localhost:8000";
-
-type FileUploadProps = {
-  setTableData: Dispatch<SetStateAction<ApiResponse | null>>;
+type UploadFileApiResponse = {
+  file_id: string;
 };
 
-const FileUpload = ({ setTableData }: FileUploadProps) => {
-  const [status, setStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
+type FileUploadProps = {
+  setFileId: Dispatch<SetStateAction<string | null>>;
+  setOpenAlert: Dispatch<SetStateAction<boolean>>;
+  setAlertSeverity: Dispatch<SetStateAction<"error" | "success">>;
+  setAlertMessage: Dispatch<SetStateAction<string>>;
+};
 
-  const [alertStatus, setAlertStatus] = useState<"success" | "error">("error");
-
-  const [openAlert, setOpenAlert] = useState<boolean>(false);
+const FileUpload = ({
+  setFileId,
+  setOpenAlert,
+  setAlertSeverity,
+  setAlertMessage,
+}: FileUploadProps) => {
+  const [status, setStatus] = useState<Status>("idle");
 
   const [file, setFile] = useState<File | null>(null);
 
@@ -32,11 +36,17 @@ const FileUpload = ({ setTableData }: FileUploadProps) => {
   useEffect(() => {
     if (status === "success" || status === "error") {
       setOpenAlert(true);
-      setAlertStatus(status);
-    } else {
-      setOpenAlert(false);
+      setAlertSeverity(status);
+      setAlertMessage(
+        status === "success"
+          ? "File uploaded successfully"
+          : "Error uploading file"
+      );
+      return;
     }
-  }, [status]);
+
+    setOpenAlert(false);
+  }, [status, setOpenAlert, setAlertSeverity, setAlertMessage]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -53,7 +63,7 @@ const FileUpload = ({ setTableData }: FileUploadProps) => {
 
     try {
       setStatus("loading");
-      const response = await axios.post<ApiResponse>(
+      const response = await axios.post<UploadFileApiResponse>(
         `${API_URL}/api/process-file`,
         formData,
         {
@@ -61,7 +71,7 @@ const FileUpload = ({ setTableData }: FileUploadProps) => {
         }
       );
       setStatus("success");
-      setTableData(response.data);
+      setFileId(response.data.file_id);
     } catch (e: unknown) {
       setStatus("error");
       console.error(e);
@@ -100,19 +110,6 @@ const FileUpload = ({ setTableData }: FileUploadProps) => {
         ) : (
           <CircularProgress className="self-center" />
         ))}
-      <Collapse in={openAlert}>
-        <Alert
-          variant="filled"
-          severity={alertStatus}
-          onClose={() => {
-            setStatus("idle");
-          }}
-        >
-          {alertStatus === "success"
-            ? "File Upload Successfull"
-            : "File Upload Error"}
-        </Alert>
-      </Collapse>
     </div>
   );
 };

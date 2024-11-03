@@ -1,12 +1,118 @@
-import { ApiResponse } from "../App";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridPaginationModel,
+  GridSortModel,
+} from "@mui/x-data-grid";
+import axios from "axios";
+import { Dispatch, Fragment, SetStateAction, useEffect, useState } from "react";
+import { API_URL, Status } from "../App";
+import { CircularProgress } from "@mui/material";
 
-type TableDataProps = {
-  tableData: ApiResponse;
+export type Row = {
+  row_index: number;
+  values: {
+    [key: string]: number | string | boolean | null;
+  };
 };
 
-const TableData = ({ tableData }: TableDataProps): JSX.Element => {
-  console.log(tableData);
+export type TableColData = {
+  col_index: number;
+  col_name: string;
+  col_type: string;
+  human_col_type: string;
+};
+
+export type TableDataApiResponse = {
+  cols: { [key: string]: TableColData };
+  rows: Row[];
+  page: number;
+  pageSize: number;
+  total_rows: number;
+};
+
+type FetchTableDataProps = {
+  fileId: string;
+  paginationModel: GridPaginationModel;
+  sortingModel: GridSortModel;
+};
+
+type TableDataProps = {
+  fileId: string;
+  setOpenAlert: Dispatch<SetStateAction<boolean>>;
+  setAlertSeverity: Dispatch<SetStateAction<"error" | "success">>;
+  setAlertMessage: Dispatch<SetStateAction<string>>;
+};
+
+const TableData = ({
+  fileId,
+  setOpenAlert,
+  setAlertSeverity,
+  setAlertMessage,
+}: TableDataProps): JSX.Element => {
+  const [fetchStatus, setFetchStatus] = useState<Status>("success");
+
+  useEffect(() => {
+    if (fetchStatus === "success" || fetchStatus === "error") {
+      setOpenAlert(true);
+      setAlertSeverity(fetchStatus);
+      setAlertMessage(
+        fetchStatus === "success"
+          ? "Table data fetched successfully"
+          : "Error fetching table data"
+      );
+    }
+  }, [fetchStatus, setAlertMessage, setAlertSeverity, setOpenAlert]);
+
+  const [tableData, setTableData] = useState<TableDataApiResponse | null>(null);
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+    page: 0,
+    pageSize: 100,
+  });
+  const [sortingModel, setSortingModel] = useState<GridSortModel>([]);
+
+  useEffect(() => {
+    if (fileId === null) return;
+
+    const fetchTableData = async ({
+      fileId,
+      paginationModel,
+    }: FetchTableDataProps) => {
+      const sortBy =
+        sortingModel.length > 0 ? sortingModel[0].field : undefined;
+      const asc =
+        sortingModel.length > 0 ? sortingModel[0].sort === "asc" : undefined;
+
+      try {
+        setFetchStatus("loading");
+        const response = await axios.get<TableDataApiResponse>(
+          `${API_URL}/api/get-data`,
+          {
+            params: {
+              file_id: fileId,
+              page: paginationModel.page,
+              page_size: paginationModel.pageSize,
+              sort_by: sortBy,
+              asc,
+            },
+          }
+        );
+
+        setTableData(response.data);
+        setFetchStatus("success");
+      } catch (e) {
+        console.error(e);
+        setTableData(null);
+        setFetchStatus("error");
+      }
+    };
+
+    fetchTableData({ fileId, paginationModel, sortingModel });
+  }, [fileId, paginationModel, sortingModel]);
+
+  if (tableData === null) {
+    return <Fragment />;
+  }
 
   const rows = tableData.rows.map((row) => ({
     id: row.row_index,
@@ -27,18 +133,32 @@ const TableData = ({ tableData }: TableDataProps): JSX.Element => {
   columns = [{ field: "row_index", headerName: "#" }, ...columns];
 
   return (
-    <DataGrid
-      columns={columns}
-      rows={rows}
-      className="w-full"
-      density="compact"
-      paginationMode="server"
-      rowCount={200}
-      sortingMode="server"
-      onSortModelChange={(hola) => {
-        console.log(hola);
-      }}
-    />
+    <div className="flex flex-col w-full gap-4">
+      <div className="flex items-center h-20 gap-20">
+        <div>File ID: {fileId}</div>
+        {fetchStatus === "loading" && <CircularProgress />}
+      </div>
+      {tableData !== null && (
+        <DataGrid
+          className="w-full"
+          density="compact"
+          columns={columns}
+          rows={rows}
+          rowCount={tableData.total_rows}
+          sortingMode="server"
+          sortModel={sortingModel}
+          onSortModelChange={(newSortingModel) => {
+            setSortingModel(newSortingModel);
+          }}
+          paginationMode="server"
+          paginationModel={paginationModel}
+          onPaginationModelChange={(newPaginationModel) => {
+            setPaginationModel(newPaginationModel);
+          }}
+          disableColumnFilter
+        />
+      )}
+    </div>
   );
 };
 
