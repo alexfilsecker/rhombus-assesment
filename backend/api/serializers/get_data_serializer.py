@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from rest_framework.serializers import (
     BooleanField,
     CharField,
@@ -7,6 +9,7 @@ from rest_framework.serializers import (
 )
 
 from api.models.table_col_model import TableCol
+from api.serializers.table_col_serializer import TableColSerializer
 
 
 class GetDataSerializer(Serializer):
@@ -22,3 +25,17 @@ class GetDataSerializer(Serializer):
             raise ValidationError(f"file_id '{value}' does not exist on db")
 
         return value
+
+    def validate(self, attrs: Dict[str, Any]):
+        sort_by = attrs["sort_by"]
+        if sort_by == "row_index":
+            return attrs
+
+        file_id = attrs["file_id"]
+        cols = TableColSerializer(TableCol.objects.filter(file_id=file_id)).data
+        if sort_by not in cols.keys():
+            raise ValidationError(
+                f"cannot sort by {sort_by} because {file_id} does not have that column"
+            )
+
+        return attrs
