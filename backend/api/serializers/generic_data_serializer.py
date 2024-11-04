@@ -100,9 +100,6 @@ class GenericDataSerializer(ModelSerializer):
 
             serialized_generic_data_hash[row_index].append(serialized_generic_data)
 
-        for row_index, data in serialized_generic_data_hash.items():
-            print(row_index, data)
-
         rows: List[Dict[str, Any]] = []
         for row_index in self.row_order:
             serialized_generic_datas = serialized_generic_data_hash[row_index]
