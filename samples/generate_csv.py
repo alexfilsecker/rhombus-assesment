@@ -27,12 +27,15 @@ def generate_number(bits: int, signed: bool) -> int:
     return inner
 
 
-def generate_giberish(length: int) -> str:
-    letters = string.ascii_letters
-    return "".join(choice(letters) for _ in range(length))
+def generate_giberish(length: int):
+    def inner():
+        letters = string.ascii_letters
+        return "".join(choice(letters) for _ in range(length))
+
+    return inner
 
 
-types = {
+number_types = {
     "uint8": generate_number(8, False),
     "uint16": generate_number(16, False),
     "uint32": generate_number(32, False),
@@ -41,8 +44,18 @@ types = {
     "int16": generate_number(16, True),
     "int32": generate_number(32, True),
     "int64": generate_number(64, True),
-    "string": generate_giberish,
 }
+
+
+def number_generator():
+    return choice(list(number_types.values()))
+
+
+def string_generator():
+    return generate_giberish(randint(1, 20))
+
+
+types = {"string": string_generator, "number": number_generator}
 
 
 if __name__ == "__main__":
@@ -53,15 +66,13 @@ if __name__ == "__main__":
     with open(PATH, "w+", encoding="utf-8") as f:
         header = "".join(f"field_{i}," for i in range(cols))
         f.write(f"{header[:-1]}\n")
-        col_types = [choice(list(types.keys())) for _ in range(cols)]
+        generators = [choice(list(types.values()))() for _ in range(cols)]
+
         for _ in range(rows):
             row_string = ""
             for col in range(cols):
-                selected_type = col_types[col]
-                args = []
-                if selected_type == "string":
-                    args.append(randint(1, 20))
-                row_string += types[selected_type](*args) + ","
+                generator = generators[col]
+                row_string += generator() + ","
 
             row_string = row_string[:-1] + "\n"
             f.write(row_string)
