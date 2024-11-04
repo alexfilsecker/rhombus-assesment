@@ -4,6 +4,7 @@ from typing import Any, List
 
 import pandas as pd
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.db.models import Case, When
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
@@ -73,50 +74,58 @@ def get_data(request: Request):
     serialized_request = GetDataSerializer(data=request.query_params)
     serialized_request.is_valid(raise_exception=True)
 
+    # Get parameters from request_query
     request_query = serialized_request.data
     file_id = request_query["file_id"]
-
     page_size = request_query["page_size"]
     page = request_query["page"]
-
     sort_by = request_query["sort_by"]
 
-    print(sort_by)
-
-    if sort_by == "row_index":
-        order_by = "row"
-
-    order_by = "row"
-
+    # Get the tables associated with the file
     table_cols_models = TableCol.objects.filter(file_id=file_id)
     cols = TableColSerializer(list(table_cols_models)).data
 
+    # Get all data from those columns
     filtered_data_models = GenericData.get_objects_by_columns(cols)
 
+    # count the total ammount of data
     total_filtered_models = filtered_data_models.count()
 
-    sorted_col_models = GenericData.get_sliced_sorted_cols(
-        filtered_data_models, cols, request_query
-    )
+    # If we sort by row_index, there is no need to do crazy shit
 
-    rows_order = [
-        GenericDataSerializer(model).data["row_index"] for model in sorted_col_models
-    ]
+    if sort_by == "row_index":
+        sorted_data_models = GenericData.slice_and_sort_by_row(
+            filtered_data_models, cols, request_query
+        )
+        rows = GenericDataSerializer(
+            list(sorted_data_models), num_of_cols=len(cols)
+        ).data["rows"]
 
-    rows = GenericDataSerializer(
-        list(filtered_data_models),
-        num_of_rows=int(len(filtered_data_models) / len(cols)),
-        starting_row=page * page_size,
-    ).data
+    else:
+        sorted_sliced_col_data_models = GenericData.slice_and_sort_by_col(
+            filtered_data_models, cols, request_query
+        )
 
-    # CleanUp internal ids
+        sorted_row_indexes = [
+            GenericDataSerializer(col_data_model).data["row_index"]
+            for col_data_model in sorted_sliced_col_data_models
+        ]
+
+        row_filtered_data_models = filtered_data_models.filter(
+            row__in=sorted_row_indexes
+        )
+        rows = GenericDataSerializer(
+            list(row_filtered_data_models), row_order=sorted_row_indexes
+        ).data["rows"]
+
+    # Cleanup internal ids
     for _, col in cols.items():
         col.pop("id")
 
     return Response(
         {
             "cols": cols,
-            **rows,
+            "rows": rows,
             "total_rows": int(total_filtered_models / len(cols)),
             "page": page,
             "page_size": page_size,

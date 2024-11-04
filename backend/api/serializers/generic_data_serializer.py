@@ -13,11 +13,12 @@ class GenericDataSerializer(ModelSerializer):
         fields = "__all__"
 
     def __init__(self, *args, **kwargs):
-        self.starting_row = 0
-        if "num_of_rows" in kwargs:
-            self.num_of_rows = kwargs.pop("num_of_rows")
-            self.starting_row = kwargs.pop("starting_row")
-            super().__init__(*args, **kwargs)
+        self.row_order = None
+        if "row_order" in kwargs:
+            self.row_order = kwargs.pop("row_order")
+        self.num_of_cols = None
+        if "num_of_cols" in kwargs:
+            self.num_of_cols = kwargs.pop("num_of_cols")
 
         super().__init__(*args, **kwargs)
 
@@ -80,17 +81,60 @@ class GenericDataSerializer(ModelSerializer):
         if not isinstance(instance, list):
             return one_representation(instance)
 
-        rows: List[Dict[str, Any]] = [{"values": {}} for _ in range(self.num_of_rows)]
-        for generic_data_model in instance:
-            serialized_generic_data = GenericDataSerializer(generic_data_model).data
-
-            row_index = serialized_generic_data["row_index"]
-            col_name = serialized_generic_data["col_name"]
-            value = serialized_generic_data["value"]
-
-            if "row_index" not in rows[row_index - self.starting_row]:
-                rows[row_index - self.starting_row]["row_index"] = row_index
-
-            rows[row_index - self.starting_row]["values"][col_name] = value
+        if self.row_order is None:
+            rows = self.represent_without_row_order(instance)
+        else:
+            rows = self.represent_with_row_order(instance)
 
         return {"rows": rows}
+
+    def represent_with_row_order(self, generic_data_models: List[GenericData]):
+        # get model representations and hash them by row_index
+        serialized_generic_data_hash: Dict[int, List[Any]] = dict()
+        for generic_data_model in generic_data_models:
+            serialized_generic_data = GenericDataSerializer(generic_data_model).data
+            row_index = serialized_generic_data["row_index"]
+
+            if row_index not in serialized_generic_data_hash:
+                serialized_generic_data_hash[row_index] = []
+
+            serialized_generic_data_hash[row_index].append(serialized_generic_data)
+
+        for row_index, data in serialized_generic_data_hash.items():
+            print(row_index, data)
+
+        rows: List[Dict[str, Any]] = []
+        for row_index in self.row_order:
+            serialized_generic_datas = serialized_generic_data_hash[row_index]
+
+            row = {"row_index": row_index, "values": {}}
+
+            for serialized_generic_data in serialized_generic_datas:
+                col_name = serialized_generic_data["col_name"]
+                value = serialized_generic_data["value"]
+                row["values"][col_name] = value
+
+            rows.append(row)
+
+        return rows
+
+    def represent_without_row_order(self, generic_data_models: List[GenericData]):
+        rows: List[Dict[str, Any]] = [
+            {"values": {}}
+            for _ in range(int(len(generic_data_models) / self.num_of_cols))
+        ]
+
+        for count, generic_data_model in enumerate(generic_data_models):
+            index = count // self.num_of_cols
+            serialized_generic_data = GenericDataSerializer(generic_data_model).data
+
+            col_name = serialized_generic_data["col_name"]
+            value = serialized_generic_data["value"]
+            row_index = serialized_generic_data["row_index"]
+
+            if "row_index" not in rows[index]:
+                rows[index]["row_index"] = row_index
+
+            rows[index]["values"][col_name] = value
+
+        return rows

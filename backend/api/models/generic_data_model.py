@@ -1,17 +1,19 @@
-from typing import Any, Dict, Set
+from typing import Any, Dict, List, Set
+
 from django.db.models import (
-    Model,
-    Index,
-    ForeignKey,
-    PositiveBigIntegerField,
-    CharField,
-    SmallIntegerField,
-    FloatField,
-    DateTimeField,
-    BooleanField,
-    Manager,
     CASCADE,
+    BooleanField,
+    CharField,
+    DateTimeField,
+    FloatField,
+    ForeignKey,
+    Index,
+    Manager,
+    Model,
+    PositiveBigIntegerField,
+    SmallIntegerField,
 )
+
 from .table_col_model import TableCol
 
 IMPORTANT_KEYS_BY_DTYPE: Dict[str, Set[str]] = {
@@ -48,39 +50,54 @@ class GenericData(Model):
     bool_value = BooleanField(null=True)
 
     @classmethod
-    def get_objects_by_columns(cls, cols: Dict[str, Dict[str, Any]]):
+    def get_objects_by_columns(
+        cls, cols: Dict[str, Dict[str, Any]]
+    ) -> Manager["GenericData"]:
         return GenericData.objects.filter(
             column__in=[col["id"] for col in cols.values()]
         )
 
-    @classmethod
-    def get_sliced_sorted_cols(
-        cls,
-        data: Manager,
+    @staticmethod
+    def slice_and_sort_by_row(
+        data: Manager["GenericData"],
         cols: Dict[str, Dict[str, Any]],
         request_query: Dict[str, Any],
     ):
+        ascending: bool = request_query["asc"]
+        page_size = request_query["page_size"]
+        page = request_query["page"]
+
+        order_by = f"{'-' if not ascending else ''}row"
+        sorted_data_models = data.order_by(order_by)[
+            page * page_size * len(cols) : (page + 1) * page_size * len(cols)
+        ]
+        return sorted_data_models
+
+    @staticmethod
+    def slice_and_sort_by_col(
+        data: Manager["GenericData"],
+        cols: Dict[str, Dict[str, Any]],
+        request_query: Dict[str, Any],
+    ) -> Manager["GenericData"]:
+        # Get parameters from request_query
         page_size = request_query["page_size"]
         page = request_query["page"]
         sort_by = request_query["sort_by"]
         ascending: bool = request_query["asc"]
 
-        num_of_cols = len(cols)
-
+        # Generate the order_by string
         sorting_col = cols[sort_by]
-
-        only_sorting_col = data.filter(column=sorting_col["id"])
-
         order_by = SORTING_MAP[sorting_col["col_type"]]
-        if not ascending:
-            order_by = "-" + order_by
 
-        sorted_col_models = only_sorting_col.order_by(order_by)[
-            page * page_size * num_of_cols : (page + 1) * page_size * num_of_cols
+        # Add '-' if it is descending
+        order_by = f"{'-' if not ascending else ''}{order_by}"
+
+        # Get data from the sorting column
+        only_sorting_col_data = data.filter(column=sorting_col["id"])
+
+        # order and slice
+        sorted_col_data_models = only_sorting_col_data.order_by(order_by)[
+            page * page_size : (page + 1) * page_size
         ]
 
-        return sorted_col_models
-
-        # return data.order_by(order_by)[
-        #     page * page_size * num_of_cols : (page + 1) * page_size * num_of_cols
-        # ]
+        return sorted_col_data_models

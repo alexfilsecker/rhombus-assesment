@@ -1,5 +1,6 @@
 from typing import List, Union
 
+from django.db.models.query import QuerySet
 from rest_framework.serializers import ModelSerializer, ValidationError
 
 from api.models.table_col_model import TableCol
@@ -19,6 +20,7 @@ class TableColSerializer(ModelSerializer):
         return value
 
     def to_representation(self, instance: Union[TableCol, List[TableCol]]):
+
         def one_representation(instance: TableCol):
             return {
                 "col_index": instance.col_index,

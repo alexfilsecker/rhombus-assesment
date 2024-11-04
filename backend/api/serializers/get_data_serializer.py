@@ -32,7 +32,8 @@ class GetDataSerializer(Serializer):
             return attrs
 
         file_id = attrs["file_id"]
-        cols = TableColSerializer(TableCol.objects.filter(file_id=file_id)).data
+        table_col_models = TableCol.objects.filter(file_id=file_id)
+        cols = TableColSerializer(list(table_col_models)).data
         if sort_by not in cols.keys():
             raise ValidationError(
                 f"cannot sort by {sort_by} because {file_id} does not have that column"
