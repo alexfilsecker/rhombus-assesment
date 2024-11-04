@@ -1,9 +1,12 @@
 import argparse
 import string
-from random import choice, randint
+from random import choice, randint, random
 from typing import Tuple
 
+import numpy as np
+
 PATH = "sample.csv"
+
 
 parser = argparse.ArgumentParser("hola!")
 
@@ -15,8 +18,8 @@ parser.add_argument(
 )
 
 
-def generate_number(bits: int, signed: bool) -> int:
-    if not signed:
+def generate_number(bits: int, signed: bool, float: bool) -> int:
+    if not signed and not float:
         # Cannot support 64 bit unsigned in db
         if bits == 64:
             bits = 63
@@ -25,7 +28,13 @@ def generate_number(bits: int, signed: bool) -> int:
         boundaries = (-(2 ** (bits - 1)), 2 ** (bits - 1) - 1)
 
     def inner():
-        return str(randint(*boundaries))
+        if not float:
+            return str(randint(*boundaries))
+
+        if bits == 32:
+            return str(np.float32(random() * randint(-1000, 1000)))
+
+        return str(random() * randint(-1000, 1000))
 
     return inner
 
@@ -39,23 +48,24 @@ def generate_giberish(length: int):
 
 
 number_types = {
-    "uint8": generate_number(8, False),
-    "uint16": generate_number(16, False),
-    "uint32": generate_number(32, False),
-    "uint64": generate_number(64, False),
-    "int8": generate_number(8, True),
-    "int16": generate_number(16, True),
-    "int32": generate_number(32, True),
-    "int64": generate_number(64, True),
+    "uint8": generate_number(8, False, False),
+    "uint16": generate_number(16, False, False),
+    "uint32": generate_number(32, False, False),
+    "uint64": generate_number(64, False, False),
+    "int8": generate_number(8, True, False),
+    "int16": generate_number(16, True, False),
+    "int32": generate_number(32, True, False),
+    "float32": generate_number(32, True, True),
+    "float64": generate_number(64, True, True),
 }
 
 
 def number_generator():
-    return choice(list(number_types.values()))
+    return choice(list(number_types.items()))
 
 
 def string_generator():
-    return generate_giberish(randint(1, 20))
+    return ("string", generate_giberish(randint(1, 20)))
 
 
 types = {"string": string_generator, "number": number_generator}
@@ -69,7 +79,9 @@ if __name__ == "__main__":
     with open(PATH, "w+", encoding="utf-8") as f:
         header = "".join(f"field_{i}," for i in range(cols))
         f.write(f"{header[:-1]}\n")
-        generators = [choice(list(types.values()))() for _ in range(cols)]
+        choices = [choice(list(types.items()))[1]() for _ in range(cols)]
+        print([chosen[0] for chosen in choices])
+        generators = [chosen[1] for chosen in choices]
 
         for _ in range(rows):
             row_string = ""
