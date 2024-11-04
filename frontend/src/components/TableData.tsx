@@ -52,6 +52,9 @@ const TableData = ({
 }: TableDataProps): JSX.Element => {
   const [fetchStatus, setFetchStatus] = useState<Status>("success");
 
+  const [fetchingController, setFetchingController] =
+    useState<AbortController | null>(null);
+
   useEffect(() => {
     if (fetchStatus === "success" || fetchStatus === "error") {
       setOpenAlert(true);
@@ -85,9 +88,15 @@ const TableData = ({
 
       try {
         setFetchStatus("loading");
+        if (fetchingController !== null) {
+          fetchingController.abort();
+        }
+        const controller = new AbortController();
+        setFetchingController(controller);
         const response = await axios.get<TableDataApiResponse>(
           `${API_URL}/api/get-data`,
           {
+            signal: controller.signal,
             params: {
               file_id: fileId,
               page: paginationModel.page,
@@ -100,7 +109,11 @@ const TableData = ({
 
         setTableData(response.data);
         setFetchStatus("success");
+        setFetchingController(null);
       } catch (e) {
+        if (e instanceof axios.CanceledError) {
+          return;
+        }
         console.error(e);
         setTableData(null);
         setFetchStatus("error");
@@ -108,6 +121,7 @@ const TableData = ({
     };
 
     fetchTableData({ fileId, paginationModel, sortingModel });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileId, paginationModel, sortingModel]);
 
   if (tableData === null) {
