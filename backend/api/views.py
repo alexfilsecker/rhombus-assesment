@@ -60,11 +60,6 @@ def process_file(req: Request) -> Response:
     return Response({"file_id": file_id})
 
 
-def printlist(l: List[Any]):
-    for i in l:
-        print(i)
-
-
 @api_view(["GET"])
 def get_data(request: Request):
 

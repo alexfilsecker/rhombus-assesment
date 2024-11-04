@@ -1,3 +1,4 @@
+import time
 from typing import List, Tuple
 
 import pandas as pd
@@ -20,7 +21,27 @@ ALL_KEYS = {
 }
 
 
+def timer(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        print(
+            f"Function {func.__name__} took {(end_time - start_time)*1000:.4f} ms to execute."
+        )
+        return result
+
+    return wrapper
+
+
+@timer
+# VERY VERY HEAVY FUNCTION, around .7 ms for data.
+def validate(data):
+    GenericDataSerializer(None, data=data).is_valid(raise_exception=True)
+
+
 @transaction.atomic
+@timer
 def create_data(
     file_id: str, df: pd.DataFrame
 ) -> Tuple[List[GenericData], List[TableCol]]:
@@ -59,14 +80,8 @@ def create_data(
                     data["uint_value"] = abs(value)
                     data["int_sign_value"] = 1 if value >= 0 else -1
 
-                print("\nDATA")
-                print(data)
-
-                generic_data_serializer = GenericDataSerializer(None, data=data)
-                generic_data_serializer.is_valid(raise_exception=True)
-                generic_data.append(
-                    GenericData(**generic_data_serializer.validated_data)
-                )
+                data["column"] = table_col
+                generic_data.append(GenericData(**data))
 
         generic_data = GenericData.objects.bulk_create(generic_data)
         return generic_data, table_cols

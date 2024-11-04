@@ -1,3 +1,4 @@
+import time
 from typing import Any, Dict, List, Set, Union
 
 import numpy as np
@@ -35,7 +36,6 @@ class GenericDataSerializer(ModelSerializer):
 
     def validate(self, attrs: Dict[str, Any]):
         col = attrs["column"]
-        print(col.col_type)
         self.validate_nones(attrs, IMPORTANT_KEYS_BY_DTYPE[col.col_type])
         return attrs
 
