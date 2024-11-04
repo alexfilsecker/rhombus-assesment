@@ -59,6 +59,9 @@ def create_data(
                     data["uint_value"] = abs(value)
                     data["int_sign_value"] = 1 if value >= 0 else -1
 
+                print("\nDATA")
+                print(data)
+
                 generic_data_serializer = GenericDataSerializer(None, data=data)
                 generic_data_serializer.is_valid(raise_exception=True)
                 generic_data.append(

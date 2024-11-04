@@ -1,9 +1,8 @@
 from typing import Any, Dict, List, Set, Union
 
 import numpy as np
-from rest_framework.serializers import ModelSerializer, ValidationError
-
 from api.models.generic_data_model import IMPORTANT_KEYS_BY_DTYPE, GenericData
+from rest_framework.serializers import ModelSerializer, ValidationError
 
 
 class GenericDataSerializer(ModelSerializer):
@@ -35,8 +34,9 @@ class GenericDataSerializer(ModelSerializer):
                     raise ValidationError(f"{key} must be set to None")
 
     def validate(self, attrs: Dict[str, Any]):
-        dtype = attrs["column"].col_type
-        self.validate_nones(attrs, IMPORTANT_KEYS_BY_DTYPE[dtype])
+        col = attrs["column"]
+        print(col.col_type)
+        self.validate_nones(attrs, IMPORTANT_KEYS_BY_DTYPE[col.col_type])
         return attrs
 
     def to_representation(self, instance: Union[GenericData, List[GenericData]]):
@@ -51,27 +51,27 @@ class GenericDataSerializer(ModelSerializer):
                 value = instance.string_value
             elif dtype.startswith("uint"):
                 uint_map = {
-                    "uint8": np.uint8(instance.uint_value),
-                    "uint16": np.uint16(instance.uint_value),
-                    "uint32": np.uint32(instance.uint_value),
-                    "uint64": np.uint64(instance.uint_value),
+                    "uint8": np.uint8,
+                    "uint16": np.uint16,
+                    "uint32": np.uint32,
+                    "uint64": np.uint64,
                 }
                 if dtype not in uint_map:
                     raise ValidationError(f"{dtype} not supported in serializer")
 
-                value = uint_map[dtype]
+                value = uint_map[dtype](instance.uint_value)
 
             elif dtype.startswith("int"):
                 int_map = {
-                    "int8": np.int8(instance.uint_value * instance.int_sign_value),
-                    "int16": np.int16(instance.uint_value * instance.int_sign_value),
-                    "int32": np.int32(instance.uint_value * instance.int_sign_value),
-                    "int64": np.int64(instance.uint_value * instance.int_sign_value),
+                    "int8": np.int8,
+                    "int16": np.int16,
+                    "int32": np.int32,
+                    "int64": np.int64,
                 }
                 if dtype not in int_map:
                     raise ValidationError(f"{dtype} not supported in serializer")
 
-                value = int_map[dtype]
+                value = int_map[dtype](instance.uint_value * instance.int_sign_value)
 
             else:
                 raise ValidationError("SHOULDN'T BE HERE")

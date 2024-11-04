@@ -17,9 +17,12 @@ parser.add_argument(
 
 def generate_number(bits: int, signed: bool) -> int:
     if not signed:
-        boundaries = (0, 2**bits - 1)
+        # Cannot support 64 bit unsigned in db
+        if bits == 64:
+            bits = 63
+        boundaries = (0, (2**bits) - 1)
     else:
-        boundaries = (-(2 ** (bits - 1)), 2**bits - 1)
+        boundaries = (-(2 ** (bits - 1)), 2 ** (bits - 1) - 1)
 
     def inner():
         return str(randint(*boundaries))

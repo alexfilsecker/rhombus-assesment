@@ -19,7 +19,7 @@ from .table_col_model import TableCol
 IMPORTANT_KEYS_BY_DTYPE: Dict[str, Set[str]] = {
     "object": {"string_value"},
     **{f"uint{2 ** i}": {"uint_value"} for i in range(3, 7)},
-    **{f"int{2 ** i}": {"int_value", "int_sign_value"} for i in range(3, 7)},
+    **{f"int{2 ** i}": {"uint_value", "int_sign_value"} for i in range(3, 7)},
     **{f"float{2 ** i}": {"double_value"} for i in range(5, 7)},
     "bool": "bool_value",
 }
