@@ -1,6 +1,6 @@
 import argparse
 import string
-from random import choice, randint, random
+from random import choice, randint, random, uniform
 from typing import Tuple
 
 import numpy as np
@@ -11,7 +11,7 @@ PATH = "sample.csv"
 parser = argparse.ArgumentParser("hola!")
 
 parser.add_argument(
-    "-r", "--rows", type=int, default=20, help="number of rows for the csv"
+    "-r", "--rows", type=int, default=10, help="number of rows for the csv"
 )
 parser.add_argument(
     "-c", "--cols", type=int, default=3, help="number of cols for the csv"
@@ -34,7 +34,13 @@ def generate_number(bits: int, signed: bool, float: bool) -> int:
         if bits == 32:
             return str(np.float32(random() * randint(-1000, 1000)))
 
-        return str(random() * randint(-1000, 1000))
+        # Generate a large exponent and a precise mantissa
+        exponent = randint(100, 200)
+        mantissa = uniform(1.0, 2.0)
+
+        # Combine the exponent and mantissa to form the float64 number
+        large_float64 = mantissa * 2**exponent
+        return str(large_float64)
 
     return inner
 
@@ -48,13 +54,13 @@ def generate_giberish(length: int):
 
 
 number_types = {
-    "uint8": generate_number(8, False, False),
-    "uint16": generate_number(16, False, False),
-    "uint32": generate_number(32, False, False),
-    "uint64": generate_number(64, False, False),
-    "int8": generate_number(8, True, False),
-    "int16": generate_number(16, True, False),
-    "int32": generate_number(32, True, False),
+    # "uint8": generate_number(8, False, False),
+    # "uint16": generate_number(16, False, False),
+    # "uint32": generate_number(32, False, False),
+    # "uint64": generate_number(64, False, False),
+    # "int8": generate_number(8, True, False),
+    # "int16": generate_number(16, True, False),
+    # "int32": generate_number(32, True, False),
     "float32": generate_number(32, True, True),
     "float64": generate_number(64, True, True),
 }
@@ -68,7 +74,10 @@ def string_generator():
     return ("string", generate_giberish(randint(1, 20)))
 
 
-types = {"string": string_generator, "number": number_generator}
+types = {
+    # "string": string_generator,
+    "number": number_generator
+}
 
 
 if __name__ == "__main__":
