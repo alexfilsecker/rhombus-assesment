@@ -79,6 +79,8 @@ def create_data(
                 elif dtype.startswith("int"):
                     data["uint_value"] = abs(value)
                     data["int_sign_value"] = 1 if value >= 0 else -1
+                elif dtype.startswith("float"):
+                    data["double_value"] = value
 
                 data["column"] = table_col
                 generic_data.append(GenericData(**data))

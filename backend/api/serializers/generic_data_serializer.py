@@ -73,6 +73,16 @@ class GenericDataSerializer(ModelSerializer):
 
                 value = int_map[dtype](instance.uint_value * instance.int_sign_value)
 
+            elif dtype.startswith("float"):
+                float_map = {
+                    "float32": np.float32,
+                    "float64": np.float64,
+                }
+                if dtype not in float_map:
+                    raise ValidationError(f"{dtype} not supported in serializer")
+
+                value = float_map[dtype](instance.double_value)
+
             else:
                 raise ValidationError("SHOULDN'T BE HERE")
 
