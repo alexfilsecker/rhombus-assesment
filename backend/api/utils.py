@@ -83,6 +83,8 @@ def create_data(
                     data["double_value"] = value
                 elif dtype == "datetime64[ns]":
                     data["datetime_value"] = value
+                elif dtype == "category":
+                    data["string_value"] = value
 
                 data["column"] = table_col
                 generic_data.append(GenericData(**data))

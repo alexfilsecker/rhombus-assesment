@@ -5,6 +5,7 @@ class TableCol(Model):
     TYPES = {
         "object": "String",
         "datetime64[ns]": "datetime",
+        "category": "Category",
         "uint8": "Unsigned 8 bit Integer",
         "uint16": "Unsigned 16 bit Integer",
         "uint32": "Unsigned 32 bit Integer",

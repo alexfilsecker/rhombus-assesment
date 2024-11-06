@@ -86,8 +86,11 @@ class GenericDataSerializer(ModelSerializer):
             elif dtype == "datetime64[ns]":
                 value = instance.datetime_value
 
+            elif dtype == "category":
+                value = instance.string_value
+
             else:
-                raise ValidationError("SHOULDN'T BE HERE")
+                raise ValidationError(f"DTYPE '{dtype}' NOT FOUND")
 
             return {**data, "value": value}
 
