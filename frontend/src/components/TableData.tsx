@@ -142,7 +142,7 @@ const TableData = ({
       field: col.col_name,
       headerName: `${col.col_name} (${col.col_type})`,
       description: col.human_col_type,
-      width: 150,
+      width: 200,
     }));
   columns = [{ field: "row_index", headerName: "#" }, ...columns];
 
