@@ -1,6 +1,7 @@
 import argparse
 from random import choice
 
+from type_generators.categories import category_generator
 from type_generators.datetimes import datetime_generator
 from type_generators.numbers import number_generator
 from type_generators.strings import string_generator
@@ -19,9 +20,10 @@ parser.add_argument(
 
 
 types = {
-    "string": string_generator,
-    "number": number_generator,
-    "datetime": datetime_generator,
+    # "string": string_generator,
+    # "number": number_generator,
+    # "datetime": datetime_generator,
+    "categories": category_generator
 }
 
 
