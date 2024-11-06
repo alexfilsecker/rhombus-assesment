@@ -2,7 +2,7 @@ from typing import Set
 
 import pandas as pd
 
-MAX_NUMBER_OF_CATEGORIES = 10
+PERCENTAGE_TO_BE_CATEGORY = 0.05
 
 
 def category_conversion(df: pd.DataFrame, col: str) -> bool:
@@ -10,7 +10,7 @@ def category_conversion(df: pd.DataFrame, col: str) -> bool:
     string_set: Set[str] = set()
     for value in data:
         string_set.add(value)
-        if len(string_set) > MAX_NUMBER_OF_CATEGORIES:
+        if len(string_set) / len(data) > PERCENTAGE_TO_BE_CATEGORY:
             return False
 
     converted = pd.Categorical(data)
