@@ -81,6 +81,8 @@ def create_data(
                     data["int_sign_value"] = 1 if value >= 0 else -1
                 elif dtype.startswith("float"):
                     data["double_value"] = value
+                elif dtype == "datetime64[ns]":
+                    data["datetime_value"] = value
 
                 data["column"] = table_col
                 generic_data.append(GenericData(**data))

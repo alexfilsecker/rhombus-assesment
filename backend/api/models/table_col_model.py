@@ -1,12 +1,10 @@
-from django.db.models import Model, CharField, PositiveIntegerField, Index
+from django.db.models import CharField, Index, Model, PositiveIntegerField
 
 
 class TableCol(Model):
     TYPES = {
         "object": "String",
-        # "": "Date",
-        # "DT": "DateTime",
-        # "DTZ": "DateTime with TimeZone",
+        "datetime64[ns]": "datetime",
         "uint8": "Unsigned 8 bit Integer",
         "uint16": "Unsigned 16 bit Integer",
         "uint32": "Unsigned 32 bit Integer",
@@ -23,7 +21,7 @@ class TableCol(Model):
     file_id = CharField(max_length=50, null=False, blank=False)
     col_index = PositiveIntegerField(null=False)
     col_name = CharField(max_length=30, null=False, blank=False)
-    col_type = CharField(choices=TYPES, max_length=10)
+    col_type = CharField(choices=TYPES, max_length=20)
 
     class Meta:
         db_table = "api_table_col"

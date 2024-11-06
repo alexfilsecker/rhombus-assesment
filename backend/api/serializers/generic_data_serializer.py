@@ -83,6 +83,9 @@ class GenericDataSerializer(ModelSerializer):
 
                 value = float_map[dtype](instance.double_value)
 
+            elif dtype == "datetime64[ns]":
+                value = instance.datetime_value
+
             else:
                 raise ValidationError("SHOULDN'T BE HERE")
 

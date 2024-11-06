@@ -49,6 +49,7 @@ def number_conversion(df: pd.DataFrame, col: str) -> bool:
 
 def date_time_conversion(df: pd.DataFrame, col: str) -> bool:
     data = df[col]
+    print("\n", col)
     converted = pd.to_datetime(data, errors="coerce")
     if not converted.notna().all():
         return False
@@ -60,6 +61,8 @@ def date_time_conversion(df: pd.DataFrame, col: str) -> bool:
 def infer_and_convert_data_types(df: pd.DataFrame) -> pd.DataFrame:
     for col in df.columns:
         data = df[col]
+
+        print("\nPENEEEEEEE", data.dtype)
 
         if data.dtype == "int64" or data.dtype == "float64":
             # downcast the data
@@ -76,7 +79,15 @@ def infer_and_convert_data_types(df: pd.DataFrame) -> pd.DataFrame:
             if number_conversion(df, col):
                 continue
 
-            # if date_time_conversion(df, col):
-            #     continue
+            if date_time_conversion(df, col):
+                continue
 
     return df
+
+
+if __name__ == "__main__":
+    print("\n--- SCRIPT TESTING ---")
+    PATH = "samples/sample.csv"
+    df = pd.read_csv(PATH)
+    df = infer_and_convert_data_types(df)
+    print(df.dtypes)
