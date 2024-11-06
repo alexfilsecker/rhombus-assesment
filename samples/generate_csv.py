@@ -20,10 +20,10 @@ parser.add_argument(
 
 
 types = {
-    # "string": string_generator,
+    "string": string_generator,
     # "number": number_generator,
     # "datetime": datetime_generator,
-    "categories": category_generator
+    "categories": category_generator,
 }
 
 
