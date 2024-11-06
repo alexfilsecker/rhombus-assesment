@@ -22,6 +22,7 @@ IMPORTANT_KEYS_BY_DTYPE: Dict[str, Set[str]] = {
     **{f"int{2 ** i}": {"uint_value", "int_sign_value"} for i in range(3, 7)},
     **{f"float{2 ** i}": {"double_value"} for i in range(5, 7)},
     "bool": "bool_value",
+    "complex128": {"double_value", "double_imag_value"},
 }
 
 
@@ -45,6 +46,7 @@ class GenericData(Model):
     int_sign_value = SmallIntegerField(null=True)
     uint_value = PositiveBigIntegerField(null=True)
     double_value = FloatField(null=True)
+    double_imag_value = FloatField(null=True)
     datetime_value = DateTimeField(null=True)
     time_zone_info_value = CharField(max_length=30, null=True)
     bool_value = BooleanField(null=True)

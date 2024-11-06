@@ -9,11 +9,18 @@ import { Dispatch, Fragment, SetStateAction, useEffect, useState } from "react";
 import { API_URL, Status } from "../App";
 import { CircularProgress } from "@mui/material";
 
+type Complex = {
+  real: number;
+  imag: number;
+};
+
+type RowValues = {
+  [key: string]: number | string | boolean | null | Complex;
+};
+
 export type Row = {
   row_index: number;
-  values: {
-    [key: string]: number | string | boolean | null;
-  };
+  values: RowValues;
 };
 
 export type TableColData = {
@@ -128,11 +135,35 @@ const TableData = ({
     return <Fragment />;
   }
 
-  const rows = tableData.rows.map((row) => ({
-    id: row.row_index,
-    row_index: row.row_index + 1,
-    ...row.values,
-  }));
+  const rows = tableData.rows.map((row) => {
+    const rowValues = Object.entries(row.values).reduce<RowValues>(
+      (acc, [key, value]) => {
+        if (tableData.cols[key].col_type !== "complex128") {
+          acc[key] = value;
+          return acc;
+        }
+
+        if (typeof value !== "object" || value === null) {
+          acc[key] = value;
+          return acc;
+        }
+
+        if (!("real" in value) || !("imag" in value)) {
+          acc[key] = value;
+          return acc;
+        }
+
+        acc[key] = `${value.real} + ${value.imag}j`;
+        return acc;
+      },
+      {}
+    );
+    return {
+      id: row.row_index,
+      row_index: row.row_index + 1,
+      ...rowValues,
+    };
+  });
 
   let columns: GridColDef<(typeof rows)[number]>[] = Object.values(
     tableData.cols

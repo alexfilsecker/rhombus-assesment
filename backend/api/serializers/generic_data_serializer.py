@@ -83,6 +83,11 @@ class GenericDataSerializer(ModelSerializer):
 
                 value = float_map[dtype](instance.double_value)
 
+            elif dtype.startswith("complex"):
+                real = instance.double_value
+                imag = instance.double_imag_value
+                value = {"real": real, "imag": imag}
+
             elif dtype == "datetime64[ns]":
                 value = instance.datetime_value
 

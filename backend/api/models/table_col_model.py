@@ -16,6 +16,7 @@ class TableCol(Model):
         "int64": "Signed 64 bit Integer",
         "float32": "32 bit Floating Number",
         "float64": "Float64",
+        "complex128": "Complex128",
         "bool": "Boolean",
     }
 

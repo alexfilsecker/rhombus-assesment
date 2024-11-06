@@ -15,6 +15,7 @@ ALL_KEYS = {
     "int_sign_value",
     "uint_value",
     "double_value",
+    "double_imag_value",
     "datetime_value",
     "time_zone_info_value",
     "bool_value",
@@ -81,6 +82,10 @@ def create_data(
                     data["int_sign_value"] = 1 if value >= 0 else -1
                 elif dtype.startswith("float"):
                     data["double_value"] = value
+                elif dtype.startswith("complex"):
+                    value: complex
+                    data["double_value"] = value.real
+                    data["double_imag_value"] = value.imag
                 elif dtype == "datetime64[ns]":
                     data["datetime_value"] = value
                 elif dtype == "category":
