@@ -3,6 +3,7 @@ import FileUpload from "./components/FileUpload";
 import TableData from "./components/TableData";
 import Snackie from "./components/Snackie";
 import PreviewTable from "./components/PreviewTable";
+import ProcessOptions from "./components/ProcessOptions";
 
 export const API_URL = "http://localhost:8000";
 
@@ -12,6 +13,8 @@ const App = (): JSX.Element => {
   const [fileId, setFileId] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
+
+  const [headers, setHeaders] = useState<string[] | null>(null);
 
   const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
     "success"
@@ -32,7 +35,10 @@ const App = (): JSX.Element => {
             file={file}
             setFile={setFile}
           />
-          {file !== null && fileId === null && <PreviewTable file={file} />}
+          {headers !== null && <ProcessOptions headers={headers} />}
+          {file !== null && fileId === null && (
+            <PreviewTable file={file} setHeaders={setHeaders} />
+          )}
           {fileId !== null && (
             <TableData
               fileId={fileId}

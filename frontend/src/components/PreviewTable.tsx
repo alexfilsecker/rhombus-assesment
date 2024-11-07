@@ -7,13 +7,14 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 type PreviewTableProps = {
   file: File;
+  setHeaders: Dispatch<SetStateAction<string[] | null>>;
 };
 
-const PreviewTable = ({ file }: PreviewTableProps): JSX.Element => {
+const PreviewTable = ({ file, setHeaders }: PreviewTableProps): JSX.Element => {
   const [fileCells, setFileCells] = useState<string[][]>([]);
 
   useEffect(() => {
@@ -29,6 +30,7 @@ const PreviewTable = ({ file }: PreviewTableProps): JSX.Element => {
       splited.slice(0, splited.length > 11 ? 11 : -1);
 
       setFileCells(splited);
+      setHeaders(splited[0]);
     };
 
     reader.readAsText(file);
