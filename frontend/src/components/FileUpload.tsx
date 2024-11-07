@@ -19,7 +19,10 @@ type FileUploadProps = {
 export type ForceCastTypes = keyof typeof ForceCastValueMap;
 
 export type CastMap = {
-  [header: string]: ForceCastTypes;
+  [header: string]: {
+    type: ForceCastTypes;
+    option?: string;
+  };
 };
 
 const FileUpload = ({ setFileId, setAlertStatus }: FileUploadProps) => {
@@ -56,8 +59,15 @@ const FileUpload = ({ setFileId, setAlertStatus }: FileUploadProps) => {
     const formData = new FormData();
     formData.append("file", file);
     Object.entries(forceCast).forEach(([header, value]) => {
-      if (value !== "default") {
-        formData.append(`cast-col-${header}`, value);
+      if (value.type !== "default") {
+        let appending: string = value.type;
+        if (value.option !== undefined) {
+          appending = value.option;
+          if (value.type === "datetime") {
+            appending = `datetime(${value.option})`;
+          }
+        }
+        formData.append(`cast-col-${header}`, appending);
       }
     });
 

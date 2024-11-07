@@ -8,6 +8,8 @@ import {
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { CastMap, ForceCastTypes } from "./FileUpload";
 import { ForceCastValueMap } from "../utils/constants";
+import NumberTypeOptions from "./NumberTypeOptions";
+import DateTimeTypeOptions from "./DateTimeTypeOptions";
 
 type ProcessOptionsProps = {
   headers: string[];
@@ -23,7 +25,7 @@ const ProcessOptions = ({
   const handleChange = (header: string) => {
     const inner = (event: SelectChangeEvent) => {
       const newCast = event.target.value as ForceCastTypes;
-      setForceCast((prev) => ({ ...prev, [header]: newCast }));
+      setForceCast((prev) => ({ ...prev, [header]: { type: newCast } }));
     };
     return inner;
   };
@@ -31,7 +33,7 @@ const ProcessOptions = ({
   useEffect(() => {
     setForceCast(
       headers.reduce<CastMap>((acc, header) => {
-        acc[header] = "default";
+        acc[header] = { type: "default" };
         return acc;
       }, {})
     );
@@ -40,32 +42,50 @@ const ProcessOptions = ({
   return (
     <div className="flex flex-col gap-10 overflow-x-scroll">
       <div className="text-2xl font-bold">Processing Options</div>
-      <div className="flex items-center w-full gap-2 h-32 ">
-        {headers.map((header) => {
-          const id = `select-${header}`;
-          return (
-            <FormControl fullWidth key={header} className="!min-w-44">
-              <InputLabel id={id}>{header}</InputLabel>
-              {forceCast !== null && (
-                <Select
-                  labelId={id}
-                  label={header}
-                  value={forceCast[header]}
-                  onChange={handleChange(header)}
-                >
-                  {Object.entries(ForceCastValueMap).map(
-                    ([type, humanReadable]) => (
-                      <MenuItem value={type} key={type}>
-                        {humanReadable}
-                      </MenuItem>
-                    )
-                  )}
-                </Select>
-              )}
-            </FormControl>
-          );
-        })}
-      </div>
+      {forceCast !== null && (
+        <div className="flex items-start w-full gap-2 ">
+          {headers.map((header) => {
+            const id = `select-${header}`;
+            return (
+              <div className="flex flex-col gap-3 min-w-44" key={header}>
+                <FormControl fullWidth>
+                  <InputLabel id={id}>{header}</InputLabel>
+                  <Select
+                    labelId={id}
+                    label={header}
+                    value={forceCast[header].type}
+                    onChange={handleChange(header)}
+                  >
+                    {Object.entries(ForceCastValueMap).map(
+                      ([type, humanReadable]) => (
+                        <MenuItem value={type} key={type}>
+                          {humanReadable}
+                        </MenuItem>
+                      )
+                    )}
+                  </Select>
+                </FormControl>
+                {(forceCast[header].type === "int" ||
+                  forceCast[header].type === "uint" ||
+                  forceCast[header].type === "float") && (
+                  <NumberTypeOptions
+                    forceCast={forceCast}
+                    setForceCast={setForceCast}
+                    header={header}
+                  />
+                )}
+                {forceCast[header].type === "datetime" && (
+                  <DateTimeTypeOptions
+                    forceCast={forceCast}
+                    setForceCast={setForceCast}
+                    header={header}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
