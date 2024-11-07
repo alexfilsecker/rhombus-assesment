@@ -24,7 +24,8 @@ def infer_and_convert_data_types(
             df[col], error = force_cast(data, force_casting[col], col)
             if error is not None:
                 errors[col] = error
-            continue
+            else:
+                continue
 
         if data.dtype == "int64" or data.dtype == "float64":
             # downcast the data

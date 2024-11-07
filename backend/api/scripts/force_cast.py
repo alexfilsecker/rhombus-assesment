@@ -9,8 +9,6 @@ def force_cast(
     print(f"\n--- FORCE CASTING: {col} -> {casting} ---\n")
 
     try:
-
-        # Numbers
         if casting.startswith("uint"):
             if casting == "uint":  # default
                 casting = "uint32"
@@ -25,6 +23,21 @@ def force_cast(
             if casting == "float":
                 casting = "float64"
             return data.astype(casting), None
+
+        elif casting.startswith("complex"):
+            return data.astype("complex128"), None
+
+        elif casting == "category":
+            return data.astype("category"), None
+
+        elif casting == "object":
+            return data.astype("object"), None
+
+        elif casting.startswith("datetime"):
+            if casting == "datetime":  # no format
+                return pd.to_datetime(data, errors="raise"), None
+            datetime_format = casting.split("(")[1][:-1]
+            return pd.to_datetime(data, errors="raise", format=datetime_format), None
 
         return data, f"force casting to {casting} not supported"
 
