@@ -5,52 +5,64 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
+import { CastMap, ForceCastTypes } from "./FileUpload";
+import { ForceCastValueMap } from "../utils/constants";
 
 type ProcessOptionsProps = {
   headers: string[];
+  forceCast: CastMap | null;
+  setForceCast: Dispatch<SetStateAction<CastMap | null>>;
 };
 
-type CastMap = {
-  [key: string]: string;
-};
-
-const ProcessOptions = ({ headers }: ProcessOptionsProps): JSX.Element => {
-  const [forceCast, setForceCast] = useState<CastMap>(
-    headers.reduce<CastMap>((acc, header) => {
-      acc[header] = "default";
-      return acc;
-    }, {})
-  );
-
+const ProcessOptions = ({
+  headers,
+  forceCast,
+  setForceCast,
+}: ProcessOptionsProps): JSX.Element => {
   const handleChange = (header: string) => {
     const inner = (event: SelectChangeEvent) => {
-      setForceCast((prev) => ({ ...prev, [header]: event.target.value }));
+      const newCast = event.target.value as ForceCastTypes;
+      setForceCast((prev) => ({ ...prev, [header]: newCast }));
     };
     return inner;
   };
 
+  useEffect(() => {
+    setForceCast(
+      headers.reduce<CastMap>((acc, header) => {
+        acc[header] = "default";
+        return acc;
+      }, {})
+    );
+  }, [headers, setForceCast]);
+
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-10 overflow-x-scroll">
       <div className="text-2xl font-bold">Processing Options</div>
-      <div className="flex w-full gap-10">
+      <div className="flex items-center w-full gap-2 h-32 ">
         {headers.map((header) => {
           const id = `select-${header}`;
           return (
-            <div className="min-w-44">
-              <FormControl key={header} fullWidth>
-                <InputLabel id={id}>{header}</InputLabel>
+            <FormControl fullWidth key={header} className="!min-w-44">
+              <InputLabel id={id}>{header}</InputLabel>
+              {forceCast !== null && (
                 <Select
                   labelId={id}
                   label={header}
                   value={forceCast[header]}
                   onChange={handleChange(header)}
                 >
-                  <MenuItem value="default">Default</MenuItem>
-                  <MenuItem value="number">Number</MenuItem>
+                  {Object.entries(ForceCastValueMap).map(
+                    ([type, humanReadable]) => (
+                      <MenuItem value={type} key={type}>
+                        {humanReadable}
+                      </MenuItem>
+                    )
+                  )}
                 </Select>
-              </FormControl>
-            </div>
+              )}
+            </FormControl>
           );
         })}
       </div>

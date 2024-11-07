@@ -172,14 +172,13 @@ const TableData = ({ fileId, setAlertStatus }: TableDataProps): JSX.Element => {
   columns = [{ field: "row_index", headerName: "#" }, ...columns];
 
   return (
-    <div className="flex flex-col w-full gap-4">
+    <div className="flex flex-col gap-4 w-full">
       <div className="flex items-center h-20 gap-20">
         <div>File ID: {fileId}</div>
         {fetchStatus === "loading" && <CircularProgress />}
       </div>
       {tableData !== null && (
         <DataGrid
-          className="w-full"
           density="compact"
           columns={columns}
           rows={rows}
