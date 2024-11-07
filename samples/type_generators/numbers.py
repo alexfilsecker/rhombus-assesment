@@ -35,15 +35,15 @@ def generate_number(bits: int, signed: bool, float: bool) -> str:
 
 
 NUMBER_TYPES = {
-    # "uint8": generate_number(8, False, False),
-    # "uint16": generate_number(16, False, False),
-    # "uint32": generate_number(32, False, False),
-    # "uint64": generate_number(64, False, False),
-    # "int8": generate_number(8, True, False),
-    # "int16": generate_number(16, True, False),
-    # "int32": generate_number(32, True, False),
-    # "float32": generate_number(32, True, True),
-    # "float64": generate_number(64, True, True),
+    "uint8": generate_number(8, False, False),
+    "uint16": generate_number(16, False, False),
+    "uint32": generate_number(32, False, False),
+    "uint64": generate_number(64, False, False),
+    "int8": generate_number(8, True, False),
+    "int16": generate_number(16, True, False),
+    "int32": generate_number(32, True, False),
+    "float32": generate_number(32, True, True),
+    "float64": generate_number(64, True, True),
 }
 
 

@@ -7,9 +7,6 @@ from type_generators.datetimes import datetime_generator
 from type_generators.numbers import number_generator
 from type_generators.strings import string_generator
 
-PATH = "sample.csv"
-
-
 # Parser
 parser = argparse.ArgumentParser("hola!")
 parser.add_argument(
@@ -18,14 +15,17 @@ parser.add_argument(
 parser.add_argument(
     "-c", "--cols", type=int, default=3, help="number of cols for the csv"
 )
+parser.add_argument(
+    "-f", "--file", type=str, default="sample.csv", help="name of the file ouput"
+)
 
 
 types = {
-    # "string": string_generator,
-    # "number": number_generator,
-    # "datetime": datetime_generator,
-    # "categories": category_generator,
-    "complex": complex_generator
+    "string": string_generator,
+    "number": number_generator,
+    "datetime": datetime_generator,
+    "categories": category_generator,
+    "complex": complex_generator,
 }
 
 
@@ -33,8 +33,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     cols: int = args.cols
     rows: int = args.rows
+    file: str = args.file
 
-    with open(PATH, "w+", encoding="utf-8") as f:
+    with open(file, "w+", encoding="utf-8") as f:
         header = "".join(f"field_{i}," for i in range(cols))
         f.write(f"{header[:-1]}\n")
         choices = [choice(list(types.items()))[1]() for _ in range(cols)]
