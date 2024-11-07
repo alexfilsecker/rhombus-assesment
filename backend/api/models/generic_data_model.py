@@ -23,6 +23,7 @@ IMPORTANT_KEYS_BY_DTYPE: Dict[str, Set[str]] = {
     **{f"float{2 ** i}": {"double_value"} for i in range(5, 7)},
     "bool": "bool_value",
     "complex128": {"double_value", "double_imag_value"},
+    "category": {"string_value"},
 }
 
 

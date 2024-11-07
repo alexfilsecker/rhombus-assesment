@@ -16,7 +16,7 @@ from .scripts.infer_data_types import infer_and_convert_data_types
 from .serializers.generic_data_serializer import GenericDataSerializer
 from .serializers.get_data_serializer import GetDataSerializer
 from .serializers.table_col_serializer import TableColSerializer
-from .utils import create_data
+from .utils import create_data, get_force_casting
 
 
 def error400(message: str):
@@ -47,8 +47,11 @@ def process_file(req: Request) -> Response:
     else:
         df = pd.read_excel(readable)
 
+    # Get force casting options
+    force_casting = get_force_casting(req)
+
     # Process the data frame
-    df = infer_and_convert_data_types(df)
+    df, errors = infer_and_convert_data_types(df, force_casting)
 
     # Create a unique identifier
     file_id = f"{name}-{int(time() * 100)}.{extension}"
@@ -57,13 +60,11 @@ def process_file(req: Request) -> Response:
     create_data(file_id, df)
 
     # file_id can later be used to retrieve the data
-    return Response({"file_id": file_id})
+    return Response({"file_id": file_id, "errors": errors})
 
 
 @api_view(["GET"])
 def get_data(request: Request):
-
-    print("\n--- GET DATA ---\n")
 
     # Get the request and ensure it is valid
     serialized_request = GetDataSerializer(data=request.query_params)

@@ -1,9 +1,10 @@
 import time
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 import pandas as pd
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from rest_framework.request import Request
 
 from .models.generic_data_model import GenericData
 from .models.table_col_model import TableCol
@@ -20,6 +21,18 @@ ALL_KEYS = {
     "time_zone_info_value",
     "bool_value",
 }
+
+FORCE_CASTING_MAP = {"uint": "uint64"}
+
+
+def get_force_casting(req: Request) -> Dict[str, str]:
+    force_casting: Dict[str, str] = {}
+    for key, value in req.data.items():
+        if key != "file":
+            column = key[len("cast-col-") :]
+            force_casting[column] = value
+
+    return force_casting
 
 
 def timer(func):
@@ -90,6 +103,8 @@ def create_data(
                     data["datetime_value"] = value
                 elif dtype == "category":
                     data["string_value"] = value
+
+                # validate(data)
 
                 data["column"] = table_col
                 generic_data.append(GenericData(**data))

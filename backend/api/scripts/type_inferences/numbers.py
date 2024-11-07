@@ -41,7 +41,5 @@ def number_conversion(df: pd.DataFrame, col: str) -> bool:
         return True
     except NotNumbers:
         pass
-    except Exception as e:
-        print("SEMEEEEN", e)
 
     return False
