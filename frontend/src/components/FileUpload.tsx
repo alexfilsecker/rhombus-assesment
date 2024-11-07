@@ -8,7 +8,7 @@ import {
   Dispatch,
   SetStateAction,
 } from "react";
-import { API_URL, Status } from "../App";
+import { API_URL, MyAlert, Status } from "../App";
 
 type UploadFileApiResponse = {
   file_id: string;
@@ -16,18 +16,14 @@ type UploadFileApiResponse = {
 
 type FileUploadProps = {
   setFileId: Dispatch<SetStateAction<string | null>>;
-  setOpenAlert: Dispatch<SetStateAction<boolean>>;
-  setAlertSeverity: Dispatch<SetStateAction<"error" | "success">>;
-  setAlertMessage: Dispatch<SetStateAction<string>>;
+  setAlertStatus: Dispatch<SetStateAction<MyAlert>>;
   file: File | null;
   setFile: Dispatch<SetStateAction<File | null>>;
 };
 
 const FileUpload = ({
   setFileId,
-  setOpenAlert,
-  setAlertSeverity,
-  setAlertMessage,
+  setAlertStatus,
   file,
   setFile,
 }: FileUploadProps) => {
@@ -37,24 +33,26 @@ const FileUpload = ({
 
   useEffect(() => {
     if (status === "success" || status === "error") {
-      setOpenAlert(true);
-      setAlertSeverity(status);
-      setAlertMessage(
-        status === "success"
-          ? "File uploaded successfully"
-          : "Error uploading file"
-      );
+      setAlertStatus({
+        open: true,
+        severity: status,
+        message:
+          status === "success"
+            ? "File uploaded successfully"
+            : "Error uploading file",
+      });
+
       return;
     }
 
-    setOpenAlert(false);
-  }, [status, setOpenAlert, setAlertSeverity, setAlertMessage]);
+    setAlertStatus((prev) => ({ ...prev, open: false }));
+  }, [status, setAlertStatus]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files === null || files.length === 0) return;
     setFile(files[0]);
-    setOpenAlert(false);
+    setAlertStatus((prev) => ({ ...prev, open: false }));
   };
 
   const handleUpload = async () => {

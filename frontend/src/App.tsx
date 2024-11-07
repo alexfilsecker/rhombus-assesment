@@ -9,6 +9,12 @@ export const API_URL = "http://localhost:8000";
 
 export type Status = "idle" | "loading" | "success" | "error";
 
+export type MyAlert = {
+  open: boolean;
+  severity: "success" | "error";
+  message: string;
+};
+
 const App = (): JSX.Element => {
   const [fileId, setFileId] = useState<string | null>(null);
 
@@ -16,11 +22,11 @@ const App = (): JSX.Element => {
 
   const [headers, setHeaders] = useState<string[] | null>(null);
 
-  const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
-    "success"
-  );
-  const [openAlert, setOpenAlert] = useState<boolean>(false);
-  const [alertMessage, setAlertMessage] = useState<string>("");
+  const [alertStatus, setAlertStatus] = useState<MyAlert>({
+    open: false,
+    severity: "success",
+    message: "",
+  });
 
   return (
     <>
@@ -29,9 +35,7 @@ const App = (): JSX.Element => {
           <h1 className="text-5xl font-extrabold">Rhombus AI Assessment</h1>
           <FileUpload
             setFileId={setFileId}
-            setAlertMessage={setAlertMessage}
-            setAlertSeverity={setAlertSeverity}
-            setOpenAlert={setOpenAlert}
+            setAlertStatus={setAlertStatus}
             file={file}
             setFile={setFile}
           />
@@ -40,21 +44,11 @@ const App = (): JSX.Element => {
             <PreviewTable file={file} setHeaders={setHeaders} />
           )}
           {fileId !== null && (
-            <TableData
-              fileId={fileId}
-              setAlertMessage={setAlertMessage}
-              setAlertSeverity={setAlertSeverity}
-              setOpenAlert={setOpenAlert}
-            />
+            <TableData fileId={fileId} setAlertStatus={setAlertStatus} />
           )}
         </div>
       </div>
-      <Snackie
-        alertSeverity={alertSeverity}
-        openAlert={openAlert}
-        setOpenAlert={setOpenAlert}
-        alertMessage={alertMessage}
-      />
+      <Snackie alertStatus={alertStatus} setAlertStatus={setAlertStatus} />
     </>
   );
 };

@@ -6,7 +6,7 @@ import {
 } from "@mui/x-data-grid";
 import axios from "axios";
 import { Dispatch, Fragment, SetStateAction, useEffect, useState } from "react";
-import { API_URL, Status } from "../App";
+import { API_URL, MyAlert, Status } from "../App";
 import { CircularProgress } from "@mui/material";
 
 type Complex = {
@@ -46,17 +46,10 @@ type FetchTableDataProps = {
 
 type TableDataProps = {
   fileId: string;
-  setOpenAlert: Dispatch<SetStateAction<boolean>>;
-  setAlertSeverity: Dispatch<SetStateAction<"error" | "success">>;
-  setAlertMessage: Dispatch<SetStateAction<string>>;
+  setAlertStatus: Dispatch<SetStateAction<MyAlert>>;
 };
 
-const TableData = ({
-  fileId,
-  setOpenAlert,
-  setAlertSeverity,
-  setAlertMessage,
-}: TableDataProps): JSX.Element => {
+const TableData = ({ fileId, setAlertStatus }: TableDataProps): JSX.Element => {
   const [fetchStatus, setFetchStatus] = useState<Status>("success");
 
   const [fetchingController, setFetchingController] =
@@ -64,15 +57,16 @@ const TableData = ({
 
   useEffect(() => {
     if (fetchStatus === "success" || fetchStatus === "error") {
-      setOpenAlert(true);
-      setAlertSeverity(fetchStatus);
-      setAlertMessage(
-        fetchStatus === "success"
-          ? "Table data fetched successfully"
-          : "Error fetching table data"
-      );
+      setAlertStatus({
+        open: true,
+        severity: fetchStatus,
+        message:
+          fetchStatus === "success"
+            ? "Table data fetched successfully"
+            : "Error fetching table data",
+      });
     }
-  }, [fetchStatus, setAlertMessage, setAlertSeverity, setOpenAlert]);
+  }, [fetchStatus, setAlertStatus]);
 
   const [tableData, setTableData] = useState<TableDataApiResponse | null>(null);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({

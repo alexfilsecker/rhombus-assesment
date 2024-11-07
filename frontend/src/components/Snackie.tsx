@@ -1,28 +1,25 @@
 import { Alert, Snackbar } from "@mui/material";
 import { Dispatch, SetStateAction } from "react";
+import { MyAlert } from "../App";
 
 type SnackieProps = {
-  openAlert: boolean;
-  setOpenAlert: Dispatch<SetStateAction<boolean>>;
-  alertSeverity: "success" | "error";
-  alertMessage: string;
+  setAlertStatus: Dispatch<SetStateAction<MyAlert>>;
+  alertStatus: MyAlert;
 };
 
 const Snackie = ({
-  openAlert,
-  setOpenAlert,
-  alertSeverity,
-  alertMessage,
+  setAlertStatus,
+  alertStatus,
 }: SnackieProps): JSX.Element => {
   return (
     <Snackbar
-      open={openAlert}
+      open={alertStatus.open}
       onClose={() => {
-        setOpenAlert(false);
+        setAlertStatus((prev) => ({ ...prev, open: false }));
       }}
-      autoHideDuration={alertSeverity === "success" ? 1000 : null}
+      autoHideDuration={alertStatus.severity === "success" ? 1000 : null}
     >
-      <Alert severity={alertSeverity}>{alertMessage}</Alert>
+      <Alert severity={alertStatus.severity}>{alertStatus.message}</Alert>
     </Snackbar>
   );
 };
