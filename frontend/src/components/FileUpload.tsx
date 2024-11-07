@@ -1,14 +1,10 @@
 import { Button, CircularProgress } from "@mui/material";
 import axios from "axios";
-import {
-  ChangeEvent,
-  useEffect,
-  useRef,
-  useState,
-  Dispatch,
-  SetStateAction,
-} from "react";
+import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { API_URL, MyAlert, Status } from "../App";
+import FileInput from "./FileInput";
+import ProcessOptions from "./ProcessOptions";
+import PreviewTable from "./PreviewTable";
 
 type UploadFileApiResponse = {
   file_id: string;
@@ -17,27 +13,22 @@ type UploadFileApiResponse = {
 type FileUploadProps = {
   setFileId: Dispatch<SetStateAction<string | null>>;
   setAlertStatus: Dispatch<SetStateAction<MyAlert>>;
-  file: File | null;
-  setFile: Dispatch<SetStateAction<File | null>>;
 };
 
-const FileUpload = ({
-  setFileId,
-  setAlertStatus,
-  file,
-  setFile,
-}: FileUploadProps) => {
-  const [status, setStatus] = useState<Status>("idle");
+const FileUpload = ({ setFileId, setAlertStatus }: FileUploadProps) => {
+  const [uploadStatus, setUploadStatus] = useState<Status>("idle");
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [fileCells, setFileCells] = useState<string[][]>([]);
 
   useEffect(() => {
-    if (status === "success" || status === "error") {
+    // On error or success, open the alert
+    if (uploadStatus === "success" || uploadStatus === "error") {
       setAlertStatus({
         open: true,
-        severity: status,
+        severity: uploadStatus,
         message:
-          status === "success"
+          uploadStatus === "success"
             ? "File uploaded successfully"
             : "Error uploading file",
       });
@@ -45,15 +36,9 @@ const FileUpload = ({
       return;
     }
 
+    // On every other state, close the alert
     setAlertStatus((prev) => ({ ...prev, open: false }));
-  }, [status, setAlertStatus]);
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files === null || files.length === 0) return;
-    setFile(files[0]);
-    setAlertStatus((prev) => ({ ...prev, open: false }));
-  };
+  }, [uploadStatus, setAlertStatus]);
 
   const handleUpload = async () => {
     if (file === null) return;
@@ -62,7 +47,7 @@ const FileUpload = ({
     formData.append("file", file);
 
     try {
-      setStatus("loading");
+      setUploadStatus("loading");
       const response = await axios.post<UploadFileApiResponse>(
         `${API_URL}/api/process-file`,
         formData,
@@ -70,46 +55,40 @@ const FileUpload = ({
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      setStatus("success");
+      setUploadStatus("success");
       setFileId(response.data.file_id);
     } catch (e: unknown) {
-      setStatus("error");
+      setUploadStatus("error");
       console.error(e);
     }
   };
 
   return (
-    <div className="flex flex-col gap-4 w-80">
+    <div className="flex flex-col gap-4 w-full">
       <h2 className="text-center text-lg font-bold">
         Upload your .csv or .xslx file
       </h2>
-      <input
-        type="file"
-        ref={inputRef}
-        accept=".csv"
-        onChange={handleChange}
-        className="hidden"
+
+      <FileInput
+        setFile={setFile}
+        setAlertStatus={setAlertStatus}
+        file={file}
+        setFileCells={setFileCells}
       />
-      <div className="flex flex-col w-full gap-1 items-center">
-        <Button
-          onClick={() => {
-            inputRef.current?.click();
-          }}
-          variant="outlined"
-          className="w-min"
-        >
-          SELECT
-        </Button>
-        {file !== null && <p>{file.name}</p>}
-      </div>
-      {file !== null &&
-        (status !== "loading" ? (
-          <Button variant="contained" onClick={handleUpload}>
-            PROCESS
-          </Button>
-        ) : (
-          <CircularProgress className="self-center" />
-        ))}
+
+      {fileCells.length > 0 && (
+        <div className="flex flex-col">
+          <PreviewTable fileCells={fileCells} />
+          <ProcessOptions headers={fileCells[0]} />
+          {uploadStatus !== "loading" ? (
+            <Button variant="contained" onClick={handleUpload}>
+              PROCESS
+            </Button>
+          ) : (
+            <CircularProgress className="self-center" />
+          )}
+        </div>
+      )}
     </div>
   );
 };
