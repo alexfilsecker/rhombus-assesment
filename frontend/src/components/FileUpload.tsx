@@ -19,6 +19,8 @@ type FileUploadProps = {
   setOpenAlert: Dispatch<SetStateAction<boolean>>;
   setAlertSeverity: Dispatch<SetStateAction<"error" | "success">>;
   setAlertMessage: Dispatch<SetStateAction<string>>;
+  file: File | null;
+  setFile: Dispatch<SetStateAction<File | null>>;
 };
 
 const FileUpload = ({
@@ -26,10 +28,10 @@ const FileUpload = ({
   setOpenAlert,
   setAlertSeverity,
   setAlertMessage,
+  file,
+  setFile,
 }: FileUploadProps) => {
   const [status, setStatus] = useState<Status>("idle");
-
-  const [file, setFile] = useState<File | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
 

@@ -2,6 +2,7 @@ import { useState } from "react";
 import FileUpload from "./components/FileUpload";
 import TableData from "./components/TableData";
 import Snackie from "./components/Snackie";
+import PreviewTable from "./components/PreviewTable";
 
 export const API_URL = "http://localhost:8000";
 
@@ -9,6 +10,8 @@ export type Status = "idle" | "loading" | "success" | "error";
 
 const App = (): JSX.Element => {
   const [fileId, setFileId] = useState<string | null>(null);
+
+  const [file, setFile] = useState<File | null>(null);
 
   const [alertSeverity, setAlertSeverity] = useState<"success" | "error">(
     "success"
@@ -26,7 +29,10 @@ const App = (): JSX.Element => {
             setAlertMessage={setAlertMessage}
             setAlertSeverity={setAlertSeverity}
             setOpenAlert={setOpenAlert}
+            file={file}
+            setFile={setFile}
           />
+          {file !== null && fileId === null && <PreviewTable file={file} />}
           {fileId !== null && (
             <TableData
               fileId={fileId}
