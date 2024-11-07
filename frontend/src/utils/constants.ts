@@ -14,7 +14,7 @@ export const NumberOptionsByValue = {
     uint8: "8 bits",
     uint16: "16 bits",
     uint32: "32 bits",
-    uint64: "64 bits",
+    // uint64: "64 bits", // Cannot use uint64 because sqlite3's biggest uint reaches 2**63
   },
   int: {
     int8: "8 bits",

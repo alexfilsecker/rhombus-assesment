@@ -7,8 +7,13 @@ import ProcessOptions from "./ProcessOptions";
 import PreviewTable from "./PreviewTable";
 import { ForceCastValueMap } from "../utils/constants";
 
+type UploadErrors = {
+  [header: string]: string;
+};
+
 type UploadFileApiResponse = {
   file_id: string;
+  errors: UploadErrors;
 };
 
 type FileUploadProps = {
@@ -27,6 +32,7 @@ export type CastMap = {
 
 const FileUpload = ({ setFileId, setAlertStatus }: FileUploadProps) => {
   const [uploadStatus, setUploadStatus] = useState<Status>("idle");
+  const [uploadErrors, setUploadErrors] = useState<UploadErrors>({});
 
   const [file, setFile] = useState<File | null>(null);
   const [fileCells, setFileCells] = useState<string[][]>([]);
@@ -49,6 +55,7 @@ const FileUpload = ({ setFileId, setAlertStatus }: FileUploadProps) => {
     }
 
     // On every other state, close the alert
+    setUploadErrors({});
     setAlertStatus((prev) => ({ ...prev, open: false }));
   }, [uploadStatus, setAlertStatus]);
 
@@ -82,6 +89,7 @@ const FileUpload = ({ setFileId, setAlertStatus }: FileUploadProps) => {
       );
       setUploadStatus("success");
       setFileId(response.data.file_id);
+      setUploadErrors(response.data.errors);
     } catch (e: unknown) {
       setUploadStatus("error");
       console.error(e);
@@ -122,6 +130,13 @@ const FileUpload = ({ setFileId, setAlertStatus }: FileUploadProps) => {
           )}
         </div>
       )}
+      <div className="flex flex-col gap-1 text-red-500">
+        {Object.entries(uploadErrors).map(([header, error]) => (
+          <div key={header}>
+            ERROR IN {header}: {error}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
