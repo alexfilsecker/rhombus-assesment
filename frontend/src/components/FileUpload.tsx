@@ -1,4 +1,4 @@
-import { Button, CircularProgress } from "@mui/material";
+import { Alert, AlertTitle, Button, CircularProgress } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { API_URL, MyAlert, Status } from "../App";
@@ -132,9 +132,10 @@ const FileUpload = ({ setFileId, setAlertStatus }: FileUploadProps) => {
       )}
       <div className="flex flex-col gap-1 text-red-500">
         {Object.entries(uploadErrors).map(([header, error]) => (
-          <div key={header}>
-            ERROR IN {header}: {error}
-          </div>
+          <Alert severity="error">
+            <AlertTitle>Error in {header}</AlertTitle>
+            {error}
+          </Alert>
         ))}
       </div>
     </div>
