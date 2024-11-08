@@ -6,6 +6,7 @@ from type_generators.complex import complex_generator
 from type_generators.datetimes import datetime_generator
 from type_generators.numbers import number_generator
 from type_generators.strings import string_generator
+from type_generators.time_delta import time_delta_generator
 
 # Parser
 parser = argparse.ArgumentParser("hola!")
@@ -21,11 +22,12 @@ parser.add_argument(
 
 
 types = {
-    "string": string_generator,
-    "number": number_generator,
-    "datetime": datetime_generator,
-    "categories": category_generator,
-    "complex": complex_generator,
+    # "string": string_generator,
+    # "number": number_generator,
+    # "datetime": datetime_generator,
+    # "categories": category_generator,
+    # "complex": complex_generator,
+    "timedelta": time_delta_generator
 }
 
 

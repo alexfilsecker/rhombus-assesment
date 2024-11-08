@@ -18,6 +18,7 @@ class TableCol(Model):
         "float64": "Float64",
         "complex128": "Complex128",
         "bool": "Boolean",
+        "timedelta64[ns]": "timedelta",
     }
 
     file_id = CharField(max_length=50, null=False, blank=False)

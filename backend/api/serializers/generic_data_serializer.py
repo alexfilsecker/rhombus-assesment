@@ -2,7 +2,9 @@ import time
 from typing import Any, Dict, List, Set, Union
 
 import numpy as np
+import pandas as pd
 from api.models.generic_data_model import IMPORTANT_KEYS_BY_DTYPE, GenericData
+from humanize import precisedelta
 from rest_framework.serializers import ModelSerializer, ValidationError
 
 
@@ -93,6 +95,11 @@ class GenericDataSerializer(ModelSerializer):
 
             elif dtype == "category":
                 value = instance.string_value
+
+            elif dtype == "timedelta64[ns]":
+                time_delta_value = instance.uint_value
+                timedelta: pd.Timedelta = pd.to_timedelta(time_delta_value, "ns")
+                value = precisedelta(timedelta, minimum_unit="milliseconds")
 
             else:
                 raise ValidationError(f"DTYPE '{dtype}' NOT FOUND")

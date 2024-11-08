@@ -24,6 +24,7 @@ IMPORTANT_KEYS_BY_DTYPE: Dict[str, Set[str]] = {
     "bool": "bool_value",
     "complex128": {"double_value", "double_imag_value"},
     "category": {"string_value"},
+    "timedelta64[ns]": {"uint_value"},
 }
 
 

@@ -7,6 +7,7 @@ from .type_inferences.categories import category_conversion
 from .type_inferences.complex import complex_conversion
 from .type_inferences.datetimes import date_time_conversion
 from .type_inferences.numbers import number_conversion, number_downcast
+from .type_inferences.time_delta import time_delta_conversion
 
 
 def infer_and_convert_data_types(
@@ -46,6 +47,9 @@ def infer_and_convert_data_types(
                 continue
 
             if category_conversion(df, col):
+                continue
+
+            if time_delta_conversion(df, col):
                 continue
 
             if date_time_conversion(df, col):

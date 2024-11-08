@@ -102,9 +102,13 @@ def create_data(
                 elif dtype == "datetime64[ns]":
                     data["datetime_value"] = value
                 elif dtype == "category":
+                    value: str
                     data["string_value"] = value
+                elif dtype == "timedelta64[ns]":
+                    value: pd.Timedelta
+                    data["uint_value"] = value.value
 
-                # validate(data)
+                validate(data)
 
                 data["column"] = table_col
                 generic_data.append(GenericData(**data))
