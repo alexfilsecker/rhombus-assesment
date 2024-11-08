@@ -1,0 +1,34 @@
+services:
+  rhombus-front:
+    image: rhombus-front
+    container_name: rhombus-front
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    command: npm run dev
+    ports:
+      - 3001:3000
+    volumes:
+      - ./frontend/src/:/app/src/
+      - ./frontend/public/:/app/public/
+
+  rhombus-back:
+    image: rhombus-back
+    container_name: rhombus-back
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend/backend/:/app/backend/
+      - ./backend/api/:/app/api/
+      - ./backend/db.sqlite3:/app/db.sqlite3
+    networks:
+      - rhombus-network
+
+networks:
+  rhombus-network:
+    driver: bridge
+    name: rhombus-network
