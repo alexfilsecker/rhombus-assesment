@@ -1,11 +1,11 @@
 import { Alert, AlertTitle, Button, CircularProgress } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState, Dispatch, SetStateAction } from "react";
-import { API_URL, MyAlert, Status } from "../App";
+import { MyAlert, Status } from "../App";
 import FileInput from "./FileInput";
 import ProcessOptions from "./ProcessOptions";
 import PreviewTable from "./PreviewTable";
-import { ForceCastValueMap } from "../utils/constants";
+import { API_URL, ForceCastValueMap } from "../utils/constants";
 
 type UploadErrors = {
   [header: string]: string;

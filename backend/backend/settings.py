@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+PROD = os.environ.get("ENV") == "prod"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +26,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-zhwf1=r04=%j!41)6@_c#*67ycuggvk#_vmkkiv--pk9c^qoby"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
+DEBUG = not PROD
+
+if PROD:
+    ALLOWED_HOSTS = ["www.alexfilsecker.com/rhombus"]
 
 
 # Application definition
