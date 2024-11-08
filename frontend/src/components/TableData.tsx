@@ -6,8 +6,9 @@ import {
 } from "@mui/x-data-grid";
 import axios from "axios";
 import { Dispatch, Fragment, SetStateAction, useEffect, useState } from "react";
-import { API_URL, MyAlert, Status } from "../App";
+import { MyAlert, Status } from "../App";
 import { CircularProgress } from "@mui/material";
+import { API_URL } from "../utils/constants";
 
 type Complex = {
   real: number;

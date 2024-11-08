@@ -1,24 +1,23 @@
 services:
-  rhombus-front:
-    image: rhombus-front
-    container_name: rhombus-front
+  rhombus-front-prod:
+    image: rhombus-front-prod
+    container_name: rhombus-front-prod
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-    command: npm run dev
+      dockerfile: docker/prod.Dockerfile
+    command: npm run preview
     ports:
       - 3001:3000
-    volumes:
-      - ./frontend/src/:/app/src/
-      - ./frontend/public/:/app/public/
 
-  rhombus-back:
-    image: rhombus-back
-    container_name: rhombus-back
+  rhombus-back-prod:
+    image: rhombus-back-prod
+    container_name: rhombus-back-prod
     build:
       context: ./backend
       dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - ENV=prod
     ports:
       - 8000:8000
     volumes:

@@ -3,8 +3,6 @@ import FileUpload from "./components/FileUpload";
 import TableData from "./components/TableData";
 import Snackie from "./components/Snackie";
 
-export const API_URL = "http://localhost:8000";
-
 export type Status = "idle" | "loading" | "success" | "error";
 
 export type MyAlert = {

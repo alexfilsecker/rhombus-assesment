@@ -4,7 +4,7 @@ services:
     container_name: rhombus-front
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     command: npm run dev
     ports:
       - 3000:3000
