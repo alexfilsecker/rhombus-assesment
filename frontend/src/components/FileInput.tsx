@@ -63,7 +63,7 @@ const FileInput = ({
       <input
         type="file"
         ref={inputRef}
-        accept=".csv"
+        accept=".csv, .xlsx"
         onChange={handleChange}
         className="hidden"
       />
