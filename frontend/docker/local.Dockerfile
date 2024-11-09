@@ -7,3 +7,6 @@ COPY package*.json .
 RUN npm install
 
 COPY . . 
+
+RUN rm .env.production
+RUN mv .env.local .env

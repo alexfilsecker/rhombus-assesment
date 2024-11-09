@@ -1,12 +1,13 @@
-
 services:
-  rhombus-front-prod:
-    image: rhombus-front-prod
-    container_name: rhombus-front-prod
+  rhombus-front:
+    image: rhombus-front
+    container_name: rhombus-front
     build:
       context: .
       dockerfile: docker/local.Dockerfile
     command: npm run dev
     ports:
-      - 3001:3000
-    
+      - 3000:3000
+    volumes:
+      - ./src/:/app/src/
+      - ./public/:/app/public/

@@ -6,6 +6,8 @@ services:
       context: ./frontend
       dockerfile: docker/prod.Dockerfile
     command: npm run preview
+    env_file:
+      - ./frontend/.env.production
     ports:
       - 3001:3000
 
