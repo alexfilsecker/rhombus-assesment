@@ -26,8 +26,13 @@ BASE_URL = ""
 if PROD:
     BASE_URL = "rhombus/back"
 
+print(BASE_URL)
+
 
 urlpatterns = [
     path(f"{BASE_URL}/admin/", admin.site.urls),
     path(f"{BASE_URL}/api/", include("api.urls")),
 ]
+
+
+
