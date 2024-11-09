@@ -13,7 +13,7 @@ CASTING_NAMES["float"] = "Floating Point Number"
 def force_cast(
     data: pd.Series, casting: str, col: str
 ) -> Tuple[pd.Series, Optional[str]]:
-    print(f"\n--- FORCE CASTING: {col} -> {casting} ---\n")
+    # print(f"\n--- FORCE CASTING: {col} -> {casting} ---\n")
 
     try:
         human_casting = CASTING_NAMES[casting]
@@ -50,6 +50,9 @@ def force_cast(
                 return pd.to_datetime(data, errors="raise"), None
             datetime_format = casting.split("(")[1][:-1]
             return pd.to_datetime(data, errors="raise", format=datetime_format), None
+
+        elif casting == "timedelta":
+            return pd.to_timedelta(data, errors="raise"), None
 
         return data, f"force casting to {human_casting} not supported"
 

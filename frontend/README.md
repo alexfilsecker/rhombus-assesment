@@ -1,50 +1,52 @@
-# React + TypeScript + Vite
+# Rhombus AI Assessment: Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Made with `Vite`, `React.js` framework in `Typescript` languaje. Additionally it uses `Material UI` premade components and `TailwindCSS` for managing styles. Here I'll show you how I did it.
 
-Currently, two official plugins are available:
+## Deploying
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+As said in the root [`README`](../README.md#docker) you can run `Docker` from the [`root/`](..) directory or from the [`current`](.) directory with:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+docker compose up
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Wich will start either the front and back (if run from the [`parent`](..) directory) or just the frontend (if run from [`this`](.) directory). Remember you can use `-d` flag to prevent your terminal to be arrested with logs.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### Dev it
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+If you have `Node.js` installed in your machine, you can run:
+
+```bash
+npm install
+npm run dev
 ```
+
+Wich will start the development with `Vite`.
+
+## Project Flow
+
+The frontend flow is at follows:
+
+1. **File Selection**: The user selects a `.csv` or `.xlsx` file from within it's computer.
+
+2. **File Previewing**: The page will show a preview of the first `5` lines (excluding headers) by default. the user can increase the previewing size with two buttons.
+
+3. **Casting Options**: For each column, the user can select a casting option, wich will make the backend attempt to transform that column into the specified type. The types available are:
+
+   - **Signed Integer**: with additional option of `8`, `16`, `32` or `64` bits.
+   - **Unsigned Integer**: with additional option of `8`, `16` or `32` bits. Notice that It does not reach `64` bits. That is explained in the **backends** [README](../backend/README.md)
+   - **Floating Point**: with additional option of `32` or `64` bits.
+   - **Category**
+   - **Complex**: This will result in a `128` complex value.
+   - **Text**: The default behaiviour. In pandas, a `object` value.
+   - **Date and Time**: Then displayed as an ISO formated date and time. You can specify it's format parser following the `datetime` library [documentation](https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes)
+   - **Time Delta**: Casted into a difference of time.
+
+4. **Processing Button**: When pressed, sends a request to the backends api that processes the file by infering types, converting data, storing it into a database and returns a `file_id`. The page then inmediatelly requests the stored data using the same `file_id`. This behaviour was designed to reutilize the sorting feature.
+
+5. **Processing Errors Display**: Two errors could have happened when processing the file:
+
+   1. **Unintentional Errors**: If any "unintentional" error where to happen (any `HTTP codes` different from `200`) a red `Snackbar` will appear in the bottom left corner of the screen saying that an error occured.
+   2. **Force Casting Errors**: If any of the casting options selected in step **3**, `Alerts` will appear for every column casting error.
+
+6. **Viewing the Result**: After having fetched the table data, another table will appear on the bottom part of the page. This table has been made using [`MUI X Data Grid`](https://mui.com/x/react-data-grid/). This component allows for server side sorting and pagination, and that is exactly what I used. Whenever you sort or change the page, another request is done to the server. If it is successful, it changes the table's content and a green `Snackbar` appears on the bottom left corner.

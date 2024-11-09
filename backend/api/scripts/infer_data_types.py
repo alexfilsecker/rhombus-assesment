@@ -14,7 +14,7 @@ def infer_and_convert_data_types(
     df: pd.DataFrame, force_casting: Dict[str, str]
 ) -> Tuple[pd.DataFrame, Dict[str, str]]:
 
-    print("\n--- INFER AND CONVERT DATA TYPES ---\n")
+    # print("\n--- INFER AND CONVERT DATA TYPES ---\n")
 
     errors: Dict[str, str] = {}
 
