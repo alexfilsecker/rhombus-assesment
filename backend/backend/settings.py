@@ -31,7 +31,7 @@ SECRET_KEY = "django-insecure-zhwf1=r04=%j!41)6@_c#*67ycuggvk#_vmkkiv--pk9c^qoby
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
+DEBUG = not PROD
 
 if PROD:
     ALLOWED_HOSTS = ["www.alexfilsecker.com/rhombus", "localhost"]
