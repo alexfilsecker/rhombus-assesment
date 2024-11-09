@@ -46,6 +46,7 @@ const ProcessOptions = ({
         <div className="flex items-start w-full gap-2 ">
           {headers.map((header) => {
             const id = `select-${header}`;
+            if (!(header in forceCast)) return;
             return (
               <div className="flex flex-col gap-3 min-w-44" key={header}>
                 <FormControl fullWidth>

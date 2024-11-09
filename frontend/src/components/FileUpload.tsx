@@ -132,7 +132,7 @@ const FileUpload = ({ setFileId, setAlertStatus }: FileUploadProps) => {
       )}
       <div className="flex flex-col gap-1 text-red-500">
         {Object.entries(uploadErrors).map(([header, error]) => (
-          <Alert severity="error">
+          <Alert severity="error" key={header}>
             <AlertTitle>Error in {header}</AlertTitle>
             {error}
           </Alert>

@@ -37,7 +37,7 @@ def process_file(req: Request) -> Response:
 
     # Ensure file has a correct extension
     name, extension = file.name.split(".")
-    if extension not in ["csv", "xslx"]:
+    if extension not in ["csv", "xlsx"]:
         return error400(f"Extension '.{extension}' not supported")
 
     # Create the pandas dataframe
@@ -65,7 +65,6 @@ def process_file(req: Request) -> Response:
 
 @api_view(["GET"])
 def get_data(request: Request):
-
 
     # Get the request and ensure it is valid
     serialized_request = GetDataSerializer(data=request.query_params)

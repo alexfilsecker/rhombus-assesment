@@ -1,6 +1,6 @@
 # Rhombus AI Assessment
 
-Hello! This is my version of a `.csv | .xslx` file parser.
+Hello! This is my version of a `.csv | .xlsx` file parser.
 See the video explanation: [video](TODO)
 
 ## Components
