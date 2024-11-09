@@ -25,10 +25,10 @@ PROD = os.environ.get("ENV") == "prod"
 
 BASE_URL = ""
 if PROD:
-    BASE_URL = "rhombus-back"
+    BASE_URL = "rhombus-back/"
 
 
 urlpatterns = [
-    path(f"{BASE_URL}/admin/", admin.site.urls),
-    path(f"{BASE_URL}/api/", include("api.urls")),
+    path(f"{BASE_URL}admin/", admin.site.urls),
+    path(f"{BASE_URL}api/", include("api.urls")),
 ]
