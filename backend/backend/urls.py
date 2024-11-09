@@ -24,7 +24,7 @@ PROD = os.environ.get("ENV") == "prod"
 
 BASE_URL = ""
 if PROD:
-    BASE_URL = "rhombus/back"
+    BASE_URL = "rhombus-back"
 
 print(BASE_URL)
 

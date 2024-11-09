@@ -15,7 +15,6 @@ from pathlib import Path
 
 PROD = os.environ.get("ENV") == "prod"
 
-print(PROD)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +28,7 @@ SECRET_KEY = "django-insecure-zhwf1=r04=%j!41)6@_c#*67ycuggvk#_vmkkiv--pk9c^qoby
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
+DEBUG = not PROD
 
 if PROD:
     ALLOWED_HOSTS = ["www.alexfilsecker.com/rhombus", "localhost"]
