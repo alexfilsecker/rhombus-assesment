@@ -1,0 +1,15 @@
+services:
+  frontend:
+    extends:
+      file: frontend/docker-compose.yml
+      service: rhombus-front
+
+  backend:
+    extends:
+      file: backend/docker-compose.yml
+      service: rhombus-back
+
+networks:
+  rhombus-network:
+    driver: bridge
+    name: rhombus-network

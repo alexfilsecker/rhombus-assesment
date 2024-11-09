@@ -11,3 +11,4 @@ services:
     volumes:
       - ./src/:/app/src/
       - ./public/:/app/public/
+      - ./index.html:/app/index.html
