@@ -77,6 +77,10 @@ const TableData = ({ fileId, setAlertStatus }: TableDataProps): JSX.Element => {
   const [sortingModel, setSortingModel] = useState<GridSortModel>([]);
 
   useEffect(() => {
+    setSortingModel([]);
+  }, [fileId]);
+
+  useEffect(() => {
     if (fileId === null) return;
 
     const fetchTableData = async ({
@@ -166,8 +170,8 @@ const TableData = ({ fileId, setAlertStatus }: TableDataProps): JSX.Element => {
     .sort((a, b) => a.col_index - b.col_index)
     .map((col) => ({
       field: col.col_name,
-      headerName: `${col.col_name} (${col.col_type})`,
-      description: col.human_col_type,
+      headerName: `${col.col_name} (${col.human_col_type})`,
+      description: col.col_type,
       width: 200,
     }));
   columns = [{ field: "row_index", headerName: "#" }, ...columns];

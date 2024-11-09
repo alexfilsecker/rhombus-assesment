@@ -3,7 +3,7 @@ from django.db.models import CharField, Index, Model, PositiveIntegerField
 
 class TableCol(Model):
     TYPES = {
-        "object": "String",
+        "object": "Text",
         "datetime64[ns]": "datetime",
         "category": "Category",
         "uint8": "Unsigned 8 bit Integer",
