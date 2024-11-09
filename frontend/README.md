@@ -21,7 +21,7 @@ npm install
 npm run dev
 ```
 
-Wich will start the development with `Vite`.
+Wich will start the development with `Vite`. You can access the page through: [`http://localhost:3000/rhombus-assessment`](http://localhost:3000/rhombus-assessment)
 
 ## Project Flow
 
