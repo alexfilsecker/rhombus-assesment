@@ -66,6 +66,7 @@ def process_file(req: Request) -> Response:
 @api_view(["GET"])
 def get_data(request: Request):
 
+
     # Get the request and ensure it is valid
     serialized_request = GetDataSerializer(data=request.query_params)
     serialized_request.is_valid(raise_exception=True)
