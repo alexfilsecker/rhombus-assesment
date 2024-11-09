@@ -1,0 +1,20 @@
+services:
+  rhombus-back-prod:
+    image: rhombus-back-prod
+    container_name: rhombus-back-prod
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend/:/app/backend/
+      - ./api/:/app/api/
+    networks:
+      - rhombus-network
+
+networks:
+  rhombus-network:
+    driver: bridge
+    name: rhombus-network
