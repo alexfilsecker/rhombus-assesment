@@ -29,10 +29,28 @@ This will begin the `Django` server which you can access through: [`http://local
 
 This project follows the `Django` folder structure. The entry point is always the [`manage.py`](manage.py) file.
 
-### backend
+### Main App
 
-[This](backend/) directory contains the main `Django` app. The most important files are [`setings.py`](backend/settings.py) where we set the whole app settings and [`urls.py`](backend/urls.py), where we set the urls our app can handle.
+In [`backend/`](backend/) directory contains the main `Django` app. The most important files are [`setings.py`](backend/settings.py) where we set the whole app settings and [`urls.py`](backend/urls.py), where we set the urls our app can handle.
 
-### api
+### API
 
-[Here](api/) is where
+In [`api/`](api/) is where all the app magic occurs.
+
+#### URLs
+
+In [`urls.py`](api/urls.py) is where we set up the actual url's through we access our server. There are two main ones `process-file` and `get-data`. This are the two ones that we describe in the [frontends flow](../frontend/README.md#project-flow).
+
+#### Views
+
+In [`views.py`](api/views.py) we can see the actual "controllers" that handle the routes shown in [URLs](#urls). You can see more about each one of them viewing their `docstring`'s.
+
+#### Models
+
+Normally, in a basic `Django` app all models are in a `models.py` file. But I have decided to modularize them into the [`models/`](api/models/) directory. There are two models, `TableCol` and `GenericData`. The first one stores the column information of an uploaded file and the second one stores each cell in a file excluding the headers.
+
+#### Serializers
+
+Same as `models`, I have modularized the normal `serializers.py` into the [`serializers/`](api/serializers/) directory. Here we can encounter one standard `Serializer` called `GetDataSerializer` made to validate and serialize the `request.query_params` from `get-data` sent from the frontend and two `ModelSerializer` for the two models.
+
+## Data Flow
