@@ -54,3 +54,39 @@ Normally, in a basic `Django` app all models are in a `models.py` file. But I ha
 Same as `models`, I have modularized the normal `serializers.py` into the [`serializers/`](api/serializers/) directory. Here we can encounter one standard `Serializer` called `GetDataSerializer` made to validate and serialize the `request.query_params` from `get-data` sent from the frontend and two `ModelSerializer` for the two models.
 
 ## Data Flow
+
+The flow of data is as follows:
+
+1. The file arrives to the backend through a `POST` request.
+
+2. It's extension gets validated only accepting `.csv` and `.xlsx`.
+
+3. According to it's extension we read it from memory using the `pandas` library, creating a `DataFrame` object.
+
+4. We get the `force_casting` option from the `request`.
+
+5. We inferd and convert the data using the `DataFrame` and the `force_casting` options, returning another `DataFrame` and a `errors` dictionary containing any errors that could have ocurred trying to force cast the data. See the data infererance's [README.md](api/scripts/README.md).
+
+6. We assign a `file_id` to the file made from it's name and the current timestamp.
+
+7. We save the converted `DataFrame` into the database using the `create_data` function in [`utils.py`](api/utils.py) which is an `atomic` transaction involving `TableCol` and `GenericData` models.
+
+   1. We iterate over all columns in the `DataFrame`.
+   2. For each column, we create it's model and save it into the database.
+   3. We now iterate over each cell in the column.
+   4. According to the column `dtype` we store the cell's value into different columns in the database. For example to store a `int` we use two columns, `uint_value` and `int_sign_value`. This behaiviour was designed to allow sorting from within the database.
+   5. Finally, we create all `GenericData` in a bulk operation.
+
+8. We return to the user the `file_id` and the force casting `errors`.
+
+9. The user inmediatelly requests the data from the `file_id`. This operation occurs again every time the user requests another sorting or page.
+
+10. We serialize and validate the `query_params` from the `request`.
+
+11. We retrieve all the stored file's columns and then serialize them.
+
+12. We begin a query to retrieve the data from all columns.
+
+13. We then sort and slice the data, creating a `rows` object.
+
+14. We then return the `rows` and `cols` objects to the frontend along with other information.

@@ -88,7 +88,6 @@ def get_data(request: Request):
     total_filtered_models = filtered_data_models.count()
 
     # If we sort by row_index, there is no need to do crazy shit
-
     if sort_by == "row_index":
         sorted_data_models = GenericData.slice_and_sort_by_row(
             filtered_data_models, cols, request_query

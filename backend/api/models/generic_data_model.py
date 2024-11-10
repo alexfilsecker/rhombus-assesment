@@ -28,6 +28,7 @@ IMPORTANT_KEYS_BY_DTYPE: Dict[str, Set[str]] = {
 }
 
 
+# TODO: int sorting is not correct
 SORTING_MAP: Dict[str, str] = {
     **{k: list(val)[0] for k, val in IMPORTANT_KEYS_BY_DTYPE.items()},
     "row_index": "row",
@@ -53,9 +54,9 @@ class GenericData(Model):
     time_zone_info_value = CharField(max_length=30, null=True)
     bool_value = BooleanField(null=True)
 
-    @classmethod
+    @staticmethod
     def get_objects_by_columns(
-        cls, cols: Dict[str, Dict[str, Any]]
+        cols: Dict[str, Dict[str, Any]]
     ) -> Manager["GenericData"]:
         return GenericData.objects.filter(
             column__in=[col["id"] for col in cols.values()]

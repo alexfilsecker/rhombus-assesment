@@ -108,7 +108,7 @@ def create_data(
                     value: pd.Timedelta
                     data["uint_value"] = value.value
 
-                # validate(data)  # Too expensive function
+                # validate(data)  # Too time expensive function
 
                 data["column"] = table_col
                 generic_data.append(GenericData(**data))
