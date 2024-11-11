@@ -137,6 +137,14 @@ const TableData = ({ fileId, setAlertStatus }: TableDataProps): JSX.Element => {
   const rows = tableData.rows.map((row) => {
     const rowValues = Object.entries(row.values).reduce<RowValues>(
       (acc, [key, value]) => {
+        if (
+          tableData.cols[key].col_type === "datetime64[ns]" &&
+          typeof value === "string"
+        ) {
+          acc[key] = new Date(value).toUTCString();
+          return acc;
+        }
+
         if (tableData.cols[key].col_type !== "complex128") {
           acc[key] = value;
           return acc;

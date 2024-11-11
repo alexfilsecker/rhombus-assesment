@@ -1,12 +1,14 @@
-from typing import Any, Dict, Set
+from typing import Any, Dict, List, Set
 
 from django.db.models import (
     CASCADE,
     BooleanField,
     CharField,
     DateTimeField,
+    F,
     FloatField,
     ForeignKey,
+    Func,
     Index,
     Manager,
     Model,
@@ -16,13 +18,19 @@ from django.db.models import (
 
 from .table_col_model import TableCol
 
+
+class AbsoluteValue(Func):
+    function = "ABS"
+    output_field = FloatField()
+
+
 # The keys that must be not None for each dtype
 IMPORTANT_KEYS_BY_DTYPE: Dict[str, Set[str]] = {
     "object": {"string_value"},
     **{f"uint{2 ** i}": {"uint_value"} for i in range(3, 7)},
     **{f"int{2 ** i}": {"uint_value", "int_sign_value"} for i in range(3, 7)},
     **{f"float{2 ** i}": {"double_value"} for i in range(5, 7)},
-    "bool": "bool_value",
+    "bool": {"bool_value"},
     "complex128": {"double_value", "double_imag_value"},
     "category": {"string_value"},
     "timedelta64[ns]": {"uint_value"},
@@ -31,9 +39,9 @@ IMPORTANT_KEYS_BY_DTYPE: Dict[str, Set[str]] = {
 
 # TODO: int sorting is not correct
 # The keys to sort by for each dtype
-SORTING_MAP: Dict[str, str] = {
-    **{k: list(val)[0] for k, val in IMPORTANT_KEYS_BY_DTYPE.items()},
-    "row_index": "row",
+SORTING_MAP: Dict[str, List[str]] = {
+    **{k: list(val) for k, val in IMPORTANT_KEYS_BY_DTYPE.items()},
+    "row_index": {"row"},
 }
 
 
@@ -155,17 +163,38 @@ class GenericData(Model):
 
         # Generate the order_by string
         sorting_col = cols[sort_by]
-        order_by = SORTING_MAP[sorting_col["col_type"]]
-
-        # Add '-' if it is descending
-        order_by = f"{'-' if not ascending else ''}{order_by}"
+        col_type: str = sorting_col["col_type"]
+        order_by_list = SORTING_MAP[col_type]
 
         # Get data from the sorting column
         only_sorting_col_data = data.filter(column=sorting_col["id"])
 
-        # order and slice the data from the column
-        sorted_col_data_models = only_sorting_col_data.order_by(order_by)[
-            page * page_size : (page + 1) * page_size
-        ]
+        if len(order_by_list) == 1:
+            order_by = order_by_list[0]
+
+            # Add '-' if it is descending
+            order_by = f"{'-' if not ascending else ''}{order_by}"
+
+            # order and slice the data from the column
+            sorted_col_data_models = only_sorting_col_data.order_by(order_by)[
+                page * page_size : (page + 1) * page_size
+            ]
+        else:
+            if col_type.startswith("int"):
+                signed_value = F(order_by_list[0]) * F(order_by_list[1])
+                order_by = "signed_value"
+                order_by = f"{'-' if not ascending else ''}{order_by}"
+                sorted_col_data_models = only_sorting_col_data.annotate(
+                    signed_value=signed_value
+                ).order_by(order_by)[page * page_size : (page + 1) * page_size]
+            elif col_type.startswith("complex"):
+                abs_value = AbsoluteValue(
+                    F(order_by_list[0]) ** 2 + F(order_by_list[1]) ** 2
+                )
+                order_by = "abs_value"
+                order_by = f"{'-' if not ascending else ''}{order_by}"
+                sorted_col_data_models = only_sorting_col_data.annotate(
+                    abs_value=abs_value
+                ).order_by(order_by)[page * page_size : (page + 1) * page_size]
 
         return sorted_col_data_models

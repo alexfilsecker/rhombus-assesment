@@ -22,12 +22,12 @@ parser.add_argument(
 
 
 types = {
-    "string": string_generator,
-    "number": number_generator,
-    "datetime": datetime_generator,
-    "categories": category_generator,
+    # "string": string_generator,
+    # "number": number_generator,
+    # "datetime": datetime_generator,
+    # "categories": category_generator,
     "complex": complex_generator,
-    "timedelta": time_delta_generator,
+    # "timedelta": time_delta_generator,
 }
 
 
