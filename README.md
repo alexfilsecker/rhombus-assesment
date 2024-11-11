@@ -7,9 +7,9 @@ See the video explanation: [video](TODO)
 
 The project consists of four parts:
 
-- [**Frontend**](frontend/): Made with `Vite`, `React.js` framework in `Typescript` languaje. See it's [`README.md`](frontend/README.md).
-- [**Backend**](backend/): Made with `Django` and `rest_framework` in `Python` languaje. See it's [`README.md`](backend/README.md).
-- [**Data Inferance Scripts**](backend/api/scripts/): Built into the **Backend's** API. This scripts are responsible for inferance and convertion of the data. See it's [`README.md`](backend/api/scripts/README.md).
+- [**Frontend**](frontend/): Made with `Vite`, `React.js` framework in `Typescript` language. See it's [`README.md`](frontend/README.md).
+- [**Backend**](backend/): Made with `Django` and `rest_framework` in `Python` language. See it's [`README.md`](backend/README.md).
+- [**Data Inference Scripts**](backend/api/scripts/): Built into the **Backend's** API. This scripts are responsible for inference and conversion of the data. See it's [`README.md`](backend/api/scripts/README.md).
 - [**Sample Generators**](samples/): A script for generating `.csv` files for testing the application. See it's [`README.md`](samples/README.md)
 
 ## Deployment

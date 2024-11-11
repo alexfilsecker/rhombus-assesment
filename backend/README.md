@@ -1,6 +1,6 @@
 # Rhombus AI Assessment: Backend
 
-Made with `Django` and `rest_framework` in `Python` languaje. In this part of the project, the file processing is done. As an adition to the project requirements, I have developed data persistency using the default's `sqlite3` database in the `Django` framework.
+Made with `Django` and `rest_framework` in `Python` language. In this part of the project, the file processing is done. As an addition to the project requirements, I have developed data persistency using the default's `sqlite3` database in the `Django` framework.
 
 ## Deployment
 
@@ -10,7 +10,7 @@ As said in the root [`README`](../README.md#docker) you can run `Docker` from th
 docker compose up
 ```
 
-Wich will start either the front and back (if run from the [`parent`](..) directory) or just the backend (if run from [`this`](.) directory). Remember you can use `-d` flag to prevent your terminal to be arrested with logs.
+Which will start either the front and back (if run from the [`parent`](..) directory) or just the backend (if run from [`this`](.) directory). Remember you can use `-d` flag to prevent your terminal to be arrested with logs.
 
 ### Dev it
 
@@ -31,7 +31,7 @@ This project follows the `Django` folder structure. The entry point is always th
 
 ### Main App
 
-In [`backend/`](backend/) directory contains the main `Django` app. The most important files are [`setings.py`](backend/settings.py) where we set the whole app settings and [`urls.py`](backend/urls.py), where we set the urls our app can handle.
+In [`backend/`](backend/) directory contains the main `Django` app. The most important files are [`settings.py`](backend/settings.py) where we set the whole app settings and [`urls.py`](backend/urls.py), where we set the urls our app can handle.
 
 ### API
 
@@ -39,7 +39,7 @@ In [`api/`](api/) is where all the app magic occurs.
 
 #### URLs
 
-In [`urls.py`](api/urls.py) is where we set up the actual url's through we access our server. There are two main ones `process-file` and `get-data`. This are the two ones that we describe in the [frontends flow](../frontend/README.md#project-flow).
+In [`urls.py`](api/urls.py) is where we set up the actual url's through we access our server. There are two main ones `process-file` and `get-data`. This are the two ones that we describe in the [frontend's flow](../frontend/README.md#project-flow).
 
 #### Views
 
@@ -65,7 +65,7 @@ The flow of data is as follows:
 
 4. We get the `force_casting` option from the `request`.
 
-5. We inferd and convert the data using the `DataFrame` and the `force_casting` options, returning another `DataFrame` and a `errors` dictionary containing any errors that could have ocurred trying to force cast the data. See the data infererance's [README.md](api/scripts/README.md).
+5. We infer and convert the data using the `DataFrame` and the `force_casting` options, returning another `DataFrame` and a `errors` dictionary containing any errors that could have ocurred trying to force cast the data. See the data inference's [README.md](api/scripts/README.md).
 
 6. We assign a `file_id` to the file made from it's name and the current timestamp.
 
@@ -74,12 +74,12 @@ The flow of data is as follows:
    1. We iterate over all columns in the `DataFrame`.
    2. For each column, we create it's model and save it into the database.
    3. We now iterate over each cell in the column.
-   4. According to the column `dtype` we store the cell's value into different columns in the database. For example to store a `int` we use two columns, `uint_value` and `int_sign_value`. This behaiviour was designed to allow sorting from within the database.
+   4. According to the column `dtype` we store the cell's value into different columns in the database. For example to store a `int` we use two columns, `uint_value` and `int_sign_value`. This behavior was designed to allow sorting from within the database.
    5. Finally, we create all `GenericData` in a bulk operation.
 
 8. We return to the user the `file_id` and the force casting `errors`.
 
-9. The user inmediatelly requests the data from the `file_id`. This operation occurs again every time the user requests another sorting or page.
+9. The user immediately requests the data from the `file_id`. This operation occurs again every time the user requests another sorting or page.
 
 10. We serialize and validate the `query_params` from the `request`.
 
@@ -89,4 +89,4 @@ The flow of data is as follows:
 
 13. We then sort and slice the data, creating a `rows` object.
 
-14. We then return the `rows` and `cols` objects to the frontend along with other information.
+14. We finally return the `rows` and `cols` objects to the frontend along with other information.
