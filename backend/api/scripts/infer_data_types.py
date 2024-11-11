@@ -36,7 +36,7 @@ def infer_and_convert_data_types(
         data = df[col]
 
         if col in force_casting:
-            df[col], error = force_cast(data, force_casting[col], col)
+            df[col], error = force_cast(data, force_casting[col])
             if error is not None:
                 errors[col] = error
             else:
