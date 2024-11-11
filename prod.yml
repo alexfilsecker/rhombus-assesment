@@ -1,0 +1,15 @@
+services:
+  rhombus-front-prod:
+    extends:
+      file: frontend/prod.yml
+      service: rhombus-front-prod
+
+  rhombus-back-prod:
+    extends:
+      file: backend/prod.yml
+      service: rhombus-back-prod
+
+networks:
+  rhombus-network:
+    driver: bridge
+    name: rhombus-network

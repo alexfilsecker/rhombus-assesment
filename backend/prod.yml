@@ -17,6 +17,6 @@ services:
       - rhombus-network
 
 networks:
-  rhombus-network:
+  rhombus-network-prod:
     driver: bridge
-    name: rhombus-network
+    name: rhombus-network-prod
