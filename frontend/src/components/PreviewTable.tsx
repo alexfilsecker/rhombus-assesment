@@ -19,14 +19,14 @@ const MIN_PREVIEW = 5;
 const PreviewTable = ({ fileCells }: PreviewTableProps): JSX.Element => {
   const [previewLength, setPreviewLength] = useState<number>(MIN_PREVIEW);
 
-  const handleIncDec = (ammount: number) => {
+  const handleIncDec = (amount: number) => {
     const inner = () => {
       const rows = fileCells.length - 1;
       setPreviewLength((prev) => {
-        const newLenght = prev + ammount;
-        if (newLenght > rows) return rows;
-        if (newLenght < MIN_PREVIEW) return MIN_PREVIEW;
-        return newLenght;
+        const newLength = prev + amount;
+        if (newLength > rows) return rows;
+        if (newLength < MIN_PREVIEW) return MIN_PREVIEW;
+        return newLength;
       });
     };
 

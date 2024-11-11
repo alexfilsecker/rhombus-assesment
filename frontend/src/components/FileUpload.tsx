@@ -99,7 +99,7 @@ const FileUpload = ({ setFileId, setAlertStatus }: FileUploadProps) => {
   return (
     <div className="flex flex-col gap-4 w-full">
       <h2 className="text-center text-lg font-bold">
-        Upload your .csv or .xslx file
+        Upload your .csv or .xlsx file
       </h2>
 
       <FileInput
