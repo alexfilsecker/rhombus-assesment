@@ -9,7 +9,7 @@ from type_generators.strings import string_generator
 from type_generators.time_delta import time_delta_generator
 
 # Parser
-parser = argparse.ArgumentParser("hola!")
+parser = argparse.ArgumentParser()
 parser.add_argument(
     "-r", "--rows", type=int, default=10, help="number of rows for the csv"
 )
@@ -17,17 +17,17 @@ parser.add_argument(
     "-c", "--cols", type=int, default=3, help="number of cols for the csv"
 )
 parser.add_argument(
-    "-f", "--file", type=str, default="sample.csv", help="name of the file ouput"
+    "-f", "--file", type=str, default="sample.csv", help="name of the file output"
 )
 
 
 types = {
-    # "string": string_generator,
-    # "number": number_generator,
-    # "datetime": datetime_generator,
-    # "categories": category_generator,
-    # "complex": complex_generator,
-    "timedelta": time_delta_generator
+    "string": string_generator,
+    "number": number_generator,
+    "datetime": datetime_generator,
+    "categories": category_generator,
+    "complex": complex_generator,
+    "timedelta": time_delta_generator,
 }
 
 
