@@ -13,8 +13,22 @@ from .type_inferences.time_delta import time_delta_conversion
 def infer_and_convert_data_types(
     df: pd.DataFrame, force_casting: Dict[str, str]
 ) -> Tuple[pd.DataFrame, Dict[str, str]]:
+    """
+    The function to infer and convert data types.
+    It will first attempt to force cast the data if the column
+    is in the force_casting dictionary. Then it will attempt to
+    infer the data type of the column and convert it to a more
+    appropriate data type.
 
-    # print("\n--- INFER AND CONVERT DATA TYPES ---\n")
+    Args:
+        df (pd.DataFrame): The dataframe to infer and convert
+        force_casting (Dict[str, str]): The dictionary of force casting options.
+
+    Returns:
+        Tuple: A tuple containing the dataframe and a dictionary of errors.
+            - **df** (pd.DataFrame): The dataframe with the inferred and converted data types.
+            - **errors** (Dict[str, str]): A dictionary of errors that occurred during the process.
+    """
 
     errors: Dict[str, str] = {}
 
@@ -56,11 +70,3 @@ def infer_and_convert_data_types(
                 continue
 
     return df, errors
-
-
-if __name__ == "__main__":
-    print("\n--- SCRIPT TESTING ---")
-    PATH = "samples/sample.csv"
-    df = pd.read_csv(PATH)
-    df = infer_and_convert_data_types(df)
-    print(df.dtypes)

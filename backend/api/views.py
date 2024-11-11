@@ -107,13 +107,13 @@ def get_data(req: Request) -> Response:
     # Get all data from those columns
     filtered_data_models = GenericData.get_objects_by_columns(cols)
 
-    # count the total ammount of data
+    # count the total amount of data
     total_filtered_models = filtered_data_models.count()
 
     # Sort and slice the data
     if sort_by == "row_index":
         sorted_data_models = GenericData.slice_and_sort_by_row(
-            filtered_data_models, cols, request_query
+            filtered_data_models, len(cols), request_query
         )
         rows = GenericDataSerializer(
             list(sorted_data_models), num_of_cols=len(cols)

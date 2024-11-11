@@ -10,11 +10,21 @@ CASTING_NAMES["int"] = "Signed Integer"
 CASTING_NAMES["float"] = "Floating Point Number"
 
 
-def force_cast(
-    data: pd.Series, casting: str, col: str
-) -> Tuple[pd.Series, Optional[str]]:
-    # print(f"\n--- FORCE CASTING: {col} -> {casting} ---\n")
+def force_cast(data: pd.Series, casting: str) -> Tuple[pd.Series, Optional[str]]:
+    """
+    Attempts to force cast the data to the specified type.
 
+    Args:
+        data (pd.Series): The data to convert
+        casting (str): the type to convert the data to
+
+    Returns:
+        Tuple: A tuple containing the converted data and an error message if any.
+            - **data** (pd.Series): The converted data.
+            - **error** (Optional[str]): An error message if any.
+    """
+
+    # Get the human readable casting name
     try:
         human_casting = CASTING_NAMES[casting]
     except KeyError:

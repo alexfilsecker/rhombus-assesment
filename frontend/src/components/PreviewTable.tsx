@@ -50,7 +50,9 @@ const PreviewTable = ({ fileCells }: PreviewTableProps): JSX.Element => {
           <TableHead>
             <TableRow>
               {headers.map((headerCell, headerIndex) => (
-                <TableCell key={headerIndex}>{headerCell}</TableCell>
+                <TableCell key={headerIndex} className="whitespace-nowrap">
+                  {headerCell}
+                </TableCell>
               ))}
             </TableRow>
           </TableHead>
@@ -58,7 +60,9 @@ const PreviewTable = ({ fileCells }: PreviewTableProps): JSX.Element => {
             {data.map((row, rowIndex) => (
               <TableRow key={rowIndex}>
                 {row.map((cell, cellIndex) => (
-                  <TableCell key={cellIndex}>{cell}</TableCell>
+                  <TableCell key={cellIndex} className="whitespace-nowrap">
+                    {cell}
+                  </TableCell>
                 ))}
               </TableRow>
             ))}
