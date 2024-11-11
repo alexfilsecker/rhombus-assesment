@@ -4,25 +4,14 @@ from typing import Dict, List, Tuple
 import pandas as pd
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from rest_framework import status
 from rest_framework.request import Request
+from rest_framework.response import Response
 
 from .models.generic_data_model import GenericData
 from .models.table_col_model import TableCol
 from .serializers.generic_data_serializer import GenericDataSerializer
 from .serializers.table_col_serializer import TableColSerializer
-
-ALL_KEYS = {
-    "string_value",
-    "int_sign_value",
-    "uint_value",
-    "double_value",
-    "double_imag_value",
-    "datetime_value",
-    "time_zone_info_value",
-    "bool_value",
-}
-
-FORCE_CASTING_MAP = {"uint": "uint64"}
 
 
 def get_force_casting(req: Request) -> Dict[str, str]:
@@ -48,10 +37,35 @@ def timer(func):
     return wrapper
 
 
+def error400(message: str) -> Response:
+    """A simple function to return a 400 error response.
+
+    Args:
+        message (str): The message to return in the response.
+
+    Returns:
+        response (Response): The response with the error message and status code 400.
+    """
+    return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+
+
 @timer
 # VERY VERY HEAVY FUNCTION, around .7 ms for data.
 def validate(data):
     GenericDataSerializer(None, data=data).is_valid(raise_exception=True)
+
+
+# All the keys of the GenericData model to represent data.
+ALL_KEYS = {
+    "string_value",
+    "int_sign_value",
+    "uint_value",
+    "double_value",
+    "double_imag_value",
+    "datetime_value",
+    "time_zone_info_value",
+    "bool_value",
+}
 
 
 @transaction.atomic
@@ -59,6 +73,21 @@ def validate(data):
 def create_data(
     file_id: str, df: pd.DataFrame
 ) -> Tuple[List[GenericData], List[TableCol]]:
+    """
+    An atomic operation to create all data in the database to represent the file.
+
+    Args:
+        file_id (str): The pregenerated id of the file.
+        df (DataFrame): The DataFrame to create the data from.
+
+    Raises:
+        ValidationError: When the data creation fails by any means.
+
+    Returns:
+        Tuple: A tuple containing:
+            - generic_data (List[GenericData]): The list of all created data from the file cells.
+            - table_cols (List[TableCol]): The list of all created columns.
+    """
     try:
         generic_data: List[GenericData] = []
         table_cols: List[TableCol] = []

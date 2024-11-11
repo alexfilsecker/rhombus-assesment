@@ -2,6 +2,13 @@ from django.db.models import CharField, Index, Model, PositiveIntegerField
 
 
 class TableCol(Model):
+    """
+    The model for the `api_table_col` table.
+    It stores the columns of the files uploaded by the users.
+    """
+
+    # The valid column types for the table.
+    # The values are the human readable names of the types later shown to the user.
     TYPES = {
         "object": "Text",
         "datetime64[ns]": "datetime",
@@ -30,7 +37,7 @@ class TableCol(Model):
         db_table = "api_table_col"
         indexes = [Index(fields=["file_id", "col_index"])]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"table_col = {self.file_id}: {self.col_name}, {self.TYPES[self.col_type]}"
         )

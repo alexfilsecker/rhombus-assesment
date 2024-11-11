@@ -1,11 +1,9 @@
 from io import BytesIO
 from time import time
-from typing import Any, List
 
 import pandas as pd
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import Case, When
-from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -16,15 +14,24 @@ from .scripts.infer_data_types import infer_and_convert_data_types
 from .serializers.generic_data_serializer import GenericDataSerializer
 from .serializers.get_data_serializer import GetDataSerializer
 from .serializers.table_col_serializer import TableColSerializer
-from .utils import create_data, get_force_casting
-
-
-def error400(message: str):
-    return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
+from .utils import create_data, error400, get_force_casting
 
 
 @api_view(["POST"])
 def process_file(req: Request) -> Response:
+    """Process the file in the request, infer and convert it's data and save it to the database.
+
+    Args:
+        req (Request):
+            The request object from the user.
+            It should contain the header "Content-Type": "multipart/form-data"
+            where we can find "file" and "cast-col-*" fields.
+
+    Returns:
+        Response: A json response containing the file_id and errors from the force casting process.
+    """
+
+    # Get the file from the request
     file = req.FILES.get("file")
 
     # Ensure file exists
@@ -64,10 +71,26 @@ def process_file(req: Request) -> Response:
 
 
 @api_view(["GET"])
-def get_data(request: Request):
+def get_data(req: Request) -> Response:
+    """Get data from the database and return it in a json format.
+
+    Args:
+        req (Request):
+            The request object from the user.
+            It should contain the following query parameters:
+            - file_id: The id of the file to get data from
+            - page_size: The number of rows to return
+            - page: The page number to return
+            - sort_by: The column to sort by
+            - asc: Whether to sort in ascending order
+
+    Returns:
+        Response:
+            A json response containing the data from the database formatted to be easy to display by the frontend.
+    """
 
     # Get the request and ensure it is valid
-    serialized_request = GetDataSerializer(data=request.query_params)
+    serialized_request = GetDataSerializer(data=req.query_params)
     serialized_request.is_valid(raise_exception=True)
 
     # Get parameters from request_query
@@ -87,7 +110,7 @@ def get_data(request: Request):
     # count the total ammount of data
     total_filtered_models = filtered_data_models.count()
 
-    # If we sort by row_index, there is no need to do crazy shit
+    # Sort and slice the data
     if sort_by == "row_index":
         sorted_data_models = GenericData.slice_and_sort_by_row(
             filtered_data_models, cols, request_query
@@ -109,6 +132,7 @@ def get_data(request: Request):
         row_filtered_data_models = filtered_data_models.filter(
             row__in=sorted_row_indexes
         )
+
         rows = GenericDataSerializer(
             list(row_filtered_data_models), row_order=sorted_row_indexes
         ).data["rows"]
