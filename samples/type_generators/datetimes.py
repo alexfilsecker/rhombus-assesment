@@ -26,8 +26,8 @@ DATE_TIME_FORMATS = [
 
 def random_datetime_str(format: str):
     def inner():
-        # rand_datetime = random_datetime()
-        rand_datetime = datetime.datetime.now()
+        rand_datetime = random_datetime()
+        # rand_datetime = datetime.datetime.now()
         return rand_datetime.strftime(format)
 
     return inner
