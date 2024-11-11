@@ -38,7 +38,6 @@ IMPORTANT_KEYS_BY_DTYPE: Dict[str, Set[str]] = {
 }
 
 
-# TODO: int sorting is not correct
 # The keys to sort by for each dtype
 SORTING_MAP: Dict[str, List[str]] = {
     **{k: list(val) for k, val in IMPORTANT_KEYS_BY_DTYPE.items()},
